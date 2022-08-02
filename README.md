@@ -1,5 +1,2 @@
-# Chainlock
-
-Crypto-native password manager.
-
-Unreviewed work in progress. Use at your own risk.
+# Blockchain-Password-Manager
+Final Project: Blockchain Password Manager

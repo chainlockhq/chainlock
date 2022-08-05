@@ -9,22 +9,38 @@ export default class MetamaskWallet implements Wallet {
     private mm: RawMetamask
   ) {}
 
-  
+  /**
+   * Request an address from the wallet.
+   */
   async requestAddressAccess(): Promise<string | undefined> {
     const r = await this.mm.request({ method: 'eth_requestAccounts' })
     return r.length <= 0 ? undefined : r[0]
   }
 
+  /**
+   * Get the address that's currently in use (if any).
+   */
   async getCurrentAddress(): Promise<string | undefined> {
     const r = await this.mm.request({method: 'eth_accounts'})
     return r.length <= 0 ? undefined : r[0]
   }
 
+  /**
+   * Map the inner callbacks of {@link onAddressChange} and {@link removeAddressChangeListener}
+   * to the outer callbacks that are passed to metamask,
+   * so we can safely unregister "accountsChanged" event listeners.
+   */
   private onAccountsChangedRefs = new Ref<
     (newAddress: string | undefined) => void,
     (r: string[]) => void
   >();
 
+  /**
+   * Register a function that will be called every time the current address changes.
+   * Do not forget to unregister the function with {@link removeAddressChangeListener}
+   * when it's no longer needed.
+   * @param callback the function.
+   */
   onAddressChange(innerCallback: (newAddress: string | undefined) => void): void {
     const outerCallback = (r: string[]) => {
       const newAddress = r.length <= 0 ? undefined : r[0]
@@ -36,6 +52,11 @@ export default class MetamaskWallet implements Wallet {
     this.mm.on('accountsChanged', outerCallback)
   }
 
+  /**
+   * Unregister a function that is being called every time the current address changes.
+   * The function should've been registered first with {@link onAddressChange}.
+   * @param callback the function. 
+   */
   removeAddressChangeListener(innerCallback: (newAddress: string | undefined) => void): void {
     const outerCallback = this.onAccountsChangedRefs.getAndRemove(innerCallback);
 
@@ -44,6 +65,10 @@ export default class MetamaskWallet implements Wallet {
     }
   }
 
+  /**
+   * Get from this wallet the public key of a given address (that can be used for encryption).
+   * @param address the address for which the public key should be retrieved.
+   */
   async getPublicKeyBase64(address: string): Promise<string> {
     return await this.mm.request({
       method: 'eth_getEncryptionPublicKey',
@@ -51,6 +76,12 @@ export default class MetamaskWallet implements Wallet {
     })
   }
 
+  /**
+   * Encrypt a message with a public key (obtained from {@link getPublicKeyBase64}).
+   * The public key may come from an address that the current user controls, or from one of their peers.
+   * @param publicKeyBase64 the public key, encoded in base64.
+   * @param message the message that should be encrypted with the public key.
+   */
   async encryptWithPublicKey(publicKeyBase64: string, message: string): Promise<EthEncryptedData> {
     const encryptedData = encrypt({
       publicKey: publicKeyBase64,
@@ -60,10 +91,19 @@ export default class MetamaskWallet implements Wallet {
     return Promise.resolve(encryptedData);
   }
 
+  /**
+   * Convert {@link EthEncryptedData} to something that the "eth_decrypt" RPC method can understand.
+   */
   private encryptedDataToHexString(encryptedData: EthEncryptedData): string {
     return `0x${Buffer.from(JSON.stringify(encryptedData), 'utf8').toString('hex')}`;
   }
 
+  /**
+   * Decrypt a message with this wallet.
+   * @param address the address that should be used for decryption. Note that this address
+   *                should belog to the current user, else the operation will fail.
+   * @param encryptedData the data that should be decrypted.
+   */
   async decryptWithPrivateKey(address: string, encryptedData: EthEncryptedData): Promise<string> {
     const message = await this.mm.request({
       method: 'eth_decrypt',
@@ -75,33 +115,8 @@ export default class MetamaskWallet implements Wallet {
     return Promise.resolve(message);
   }
 
-  async createTransaction(address: string, rawData: string): Promise<string> {
-    const transactionParameters = {
-      nonce: '0x00', // ignored by MetaMask
-      // gasPrice: '0x09184e72a000', // customizable by user during MetaMask confirmation.
-      // gas: '0x2710', // customizable by user during MetaMask confirmation.
-      to: '0x5C58D62b1485e1c8C774dca115409d58e78e7B23', // Required except during contract publications.
-      from: address, // must match user's active address.
-      // value: '0x00', // Only required to send ether to the recipient from the initiating external account.
-      data: rawData, // Optional, but used for defining smart contract creation and interaction.
-      // chainId: '0x3', // Used to prevent transaction reuse across blockchains. Auto-filled by MetaMask.
-    };
-    
-    // txHash is a hex string
-    // As with any RPC call, it may throw an error
-    const txHash: string = await this.mm.request({
-      method: 'eth_sendTransaction',
-      params: [transactionParameters],
-      
-    });
-
-    return txHash;
-
-  }
-
   getMetamaskObj(): RawMetamask {
     return this.mm;
   }
   
-
 }

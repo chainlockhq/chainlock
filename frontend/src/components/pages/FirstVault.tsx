@@ -6,6 +6,8 @@ import Wallet from "../../objects/Wallet.interface"
 import { ethers } from "ethers"
 import { useState, useEffect } from "react"
 import VaultFactory from "../../smartcontracts/VaultFactory.json"
+import getTransactionUrl from "../../utils/urls/get-transaction-url"
+import getAddressUrl from "../../utils/urls/get-address-url"
 
 interface Props {
   wallet: Wallet
@@ -17,10 +19,10 @@ const FirstVault = ({ wallet, connectedAddress }: Props) => {
   const [correctNetwork, setCorrectNetwork] = useState(false)
   const [deployingStatus, setDeployingStatus] = useState(0)
   const [txHash, setTxHash] = useState("")
-  const [vaultAddress, setVaultAddress] = useState()
+  const [vaultAddress, setVaultAddress] = useState<string>()
 
-  const ropstenChainId = "0x3"
-  const vaultFactoryContractAddress = "0xb4B559447c834C991Cb26FbbDB0B7c170811831F"
+  const expectedChainId = process.env.REACT_APP_CHAIN_ID
+  const vaultFactoryContractAddress = process.env.REACT_APP_VAULT_FACTORY_CONTRACT_ADDRESS
 
   // Checks if wallet is connected
   const checkIfWalletIsConnected = async () => {
@@ -47,7 +49,7 @@ const FirstVault = ({ wallet, connectedAddress }: Props) => {
     let chainId = await ethereum.request({ method: "eth_chainId" })
     console.log("Connected to chain:" + chainId)
 
-    if (chainId !== ropstenChainId) {
+    if (expectedChainId !== chainId) {
       setCorrectNetwork(false)
     } else {
       setCorrectNetwork(true)
@@ -66,7 +68,7 @@ const FirstVault = ({ wallet, connectedAddress }: Props) => {
       if (ethereum) {
         const provider = new ethers.providers.Web3Provider(ethereum)
         const signer = provider.getSigner()
-        const factoryVaultContract = new ethers.Contract(vaultFactoryContractAddress, VaultFactory.abi, signer)
+        const factoryVaultContract = new ethers.Contract(vaultFactoryContractAddress!, VaultFactory.abi, signer)
 
         let newVaultTx = await factoryVaultContract.createVault()
         setTxHash(newVaultTx.hash)
@@ -78,7 +80,7 @@ const FirstVault = ({ wallet, connectedAddress }: Props) => {
         setVaultAddress(vaultAddress)
         setDeployingStatus(2)
         console.log("New Vault created!", receipt)
-        console.log(`See transaction: https://ropsten.etherscan.io/tx/${newVaultTx.hash}`)
+        console.log(`See transaction: ${getTransactionUrl(newVaultTx.hash)}`)
       } else {
         console.log("Ethereum object doesn't exist!")
       }
@@ -103,6 +105,8 @@ const FirstVault = ({ wallet, connectedAddress }: Props) => {
     )
   }
   if (deployingStatus === 2) {
+    const txUrl = getTransactionUrl(txHash)
+    const vaultAddressUrl = getAddressUrl(vaultAddress!)
     return (
       <div className="bg-[#2b3f4a] h-screen grid grid-flex grid-cols-3 gap-6">
         <div></div>
@@ -112,13 +116,11 @@ const FirstVault = ({ wallet, connectedAddress }: Props) => {
               <p>New Vault created!</p>
               <p>
                 See transaction:
-                <a href={`https://ropsten.etherscan.io/tx/${txHash}`}> https://ropsten.etherscan.io/tx/${txHash}</a>
+                <a href={txUrl}>{txUrl}</a>
               </p>
               <p>
                 New Vault Address:
-                <a href={`https://ropsten.etherscan.io/address/${vaultAddress}`}>
-                  https://ropsten.etherscan.io/address/${vaultAddress}
-                </a>
+                <a href={vaultAddressUrl}>{vaultAddressUrl}</a>
               </p>
             </FrameMessage>
           </Frame>

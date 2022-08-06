@@ -38,28 +38,28 @@ const ConnectMetamask = ({wallet, connectedAddress, onConnect}: Props) => {
           <div className="mt-0">
             <OldFrame>
               <WalletButton
-              wallet={wallet}
-              connectedAddress={connectedAddress}
-              availableAddress={availableAddress}
-              onConnect={onConnect}
+                wallet={wallet}
+                connectedAddress={connectedAddress}
+                availableAddress={availableAddress}
+                onConnect={onConnect}
               />
               {!connectedAddress && availableAddress && (
-              <>
-              <p className="mt-2 text-gray-600 text-sm">
-                Since you have connected to Chainlock before, Metamask will automatically connect to address <Address>{availableAddress}</Address> when you click the button above.
-              </p>
-              <p className="mt-2 text-gray-600 text-sm">To use a different address, open Metamask and select the address you want to use.
-                In the top-left corner of the Metamask window, you'll see "connected" if you have used this address in Chainlock before,
-                or "disconnected" if you haven't used this address in Chainlock yet. Use these buttons to connect new addresses and/or
-                revoke permissions on previous addresses.
-              </p>
-              </>
+                <>
+                  <p className="mt-2 text-gray-600 text-sm">
+                    Since you have connected to Chainlock before, Metamask will automatically connect to address <Address>{availableAddress}</Address> when you click the button above.
+                  </p>
+                  <p className="mt-2 text-gray-600 text-sm">To use a different address, open Metamask and select the address you want to use.
+                    In the top-left corner of the Metamask window, you'll see "connected" if you have used this address in Chainlock before,
+                    or "disconnected" if you haven't used this address in Chainlock yet. Use these buttons to connect new addresses and/or
+                    revoke permissions on previous addresses.
+                  </p>
+                </>
               )}
             </OldFrame>
           </div>
         </div>
-        <div className="img-background flex justify-center pt-10 hidden md:block">
-          <img className="px-40 pt-0 md:p-20 drop-shadow-6xl" src={vaultImage} />
+        <div className="img-background pt-10 hidden md:block">
+          <img className="px-40 pt-0 md:p-20 drop-shadow-6xl" src={vaultImage} alt="" />
         </div>
         </div>
     </div>

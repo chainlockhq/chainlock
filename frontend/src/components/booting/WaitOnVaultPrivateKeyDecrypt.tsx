@@ -10,7 +10,7 @@ interface Props {
   /**
    * This function is called whenever the user wants to go back to the previous screen.
    */
-  onBack?: () => void,
+  onBack: () => void,
 }
 
 const WaitOnVaultPrivateKeyDecrypt = ({onBack, vaultAddress}: Props) => {
@@ -23,7 +23,8 @@ const WaitOnVaultPrivateKeyDecrypt = ({onBack, vaultAddress}: Props) => {
               <span className="font-light text-slate-500">You are</span> <Address named>{vaultAddress}</Address>
             </div>
             <p className="mt-2 mb-4">If you cannot see a Metamask dialog, click on the 🦊 icon in your browser.</p>
-            <p className="text-small font-light text-slate-500">To go back to vault selection, cancel the decrypt request.</p>
+            <p className="text-small font-light text-slate-500">To go back to vault selection, cancel the decrypt request or click on the button below:</p>
+            <p className="mt-2"><Button onClick={() =>onBack()}>back</Button></p>
           </div>
           <div className="faq m-auto max-w-default">
             <div className="text-center">
@@ -66,7 +67,6 @@ const WaitOnVaultPrivateKeyDecrypt = ({onBack, vaultAddress}: Props) => {
                   </details>
               </div>
             </div>
-          {onBack && (<p className="mt-2"><Button onClick={() =>onBack()}>back</Button></p>)}
         </div>
         </div>
       </Frame>

@@ -16,6 +16,7 @@ interface Return {
   vaultKeyPair: CryptoKeyPair | undefined
   isDialogOpen: boolean
   isBusy: boolean
+  hasErrored: boolean
   forgetVaultKeyPair: () => void
 }
 
@@ -28,6 +29,14 @@ const useVaultKeyPair = (
   const [ vaultKeyPair, setVaultKeyPair ] = useState<CryptoKeyPair | undefined>()
   const [ isDialogOpen, setIsDialogOpen ] = useState<boolean>(false)
   const [ isBusy, setIsBusy] = useState<boolean>(false)
+  const [ hasErrored, setHasErrored] = useState<boolean>(false)
+
+  const resetState = () => {
+    setVaultKeyPair(undefined)
+    setIsDialogOpen(false)
+    setIsBusy(false)
+    setHasErrored(false)
+  }
 
   const decryptDialog = useCallback(async (wallet: Wallet, address: string, encryptedVaultPrivateKey: EthEncryptedData) => {
     try {
@@ -51,18 +60,18 @@ const useVaultKeyPair = (
 
   // set the vault key pair...
   useEffect(() => {
-    if (wallet && address && vaultAddress && !isBusy && !vaultKeyPair) {
+    if (wallet && address && vaultAddress && !isBusy &&!hasErrored && !vaultKeyPair) {
       lock(setIsBusy, async () => {
         // NOTE: This is the private key of the current user (address) in the given vault.
         //       It is stored in the vault smart contract in encrypted form because it has to stay private...
         //       The righful owner of this private key can decrypt it with metamask to get access to their vault private key.
         //       With the vault private key, they can unlock the passwords to which they have access.
-        const encryptedVaultPrivateKey: EthEncryptedData = await getOwnEncryptedPrivateKey(wallet)
+        const encryptedVaultPrivateKey: EthEncryptedData = await getOwnEncryptedPrivateKey(wallet, vaultAddress, address)
 
         // decrypt the private vault key with metamask (prompt)
         const decryptedVaultPrivateKey = await decryptDialog(wallet, address, encryptedVaultPrivateKey)
         if (!decryptedVaultPrivateKey) {
-          return
+          return // user cancelled decrypt request
         }
         
         // NOTE: This is the public key of the current user (address) in the given vault.
@@ -75,20 +84,23 @@ const useVaultKeyPair = (
           privateKey: await importPrivateKeyBase64(decryptedVaultPrivateKey),
           publicKey: await importPublicKeyBase64(decryptedVaultPublicKey),
         })
+      }).catch(e => {
+        setHasErrored(true)
+        throw e // rethrow
       })
     }
-  }, [wallet, address, vaultAddress, isBusy, vaultKeyPair, decryptDialog])
+  }, [wallet, address, vaultAddress, isBusy, hasErrored, vaultKeyPair, decryptDialog])
 
   // unset the vault key pair...
   useEffect(() => {
     if (!wallet || !address || !vaultAddress) {
-      setVaultKeyPair(undefined)
+      resetState()
     }
   }, [wallet, address, vaultAddress])
 
-  const forgetVaultKeyPair = useCallback(() => setVaultKeyPair(undefined), [])
+  const forgetVaultKeyPair = useCallback(() => resetState(), [])
 
-  return { vaultKeyPair, forgetVaultKeyPair, isDialogOpen, isBusy }
+  return { vaultKeyPair, forgetVaultKeyPair, isDialogOpen, isBusy, hasErrored }
 }
 
 export default useVaultKeyPair

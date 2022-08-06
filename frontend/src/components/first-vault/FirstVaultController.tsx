@@ -54,6 +54,11 @@ const FirstVaultController = ({ wallet, connectedAddress }: Props) => {
     }
   }
 
+  const onContinue = async () => {
+    // TODO
+    console.log('continue...')
+  }
+
   switch(step) {
     case 'landing':
       return <FirstVaultLanding onClick={onCreateVault}/>
@@ -68,7 +73,7 @@ const FirstVaultController = ({ wallet, connectedAddress }: Props) => {
     case 'vault-joining-failed':
       return <FirstVaultJoiningError onReset={resetToJoining}/>
     case 'vault-joining-succeeded':
-      return <FirstVaultJoined/>
+      return <FirstVaultJoined onContinue={onContinue}/>
     default:
       throw new Error(`step '${step}' is not supported`)
   }

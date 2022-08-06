@@ -1,5 +1,6 @@
 import { EthEncryptedData } from "@metamask/eth-sig-util"
 import Wallet from "../../objects/Wallet.interface"
+import encryptedPrivateKeyToString from "../crypto/encryptedPrivateKeyToString"
 import exportPrivateKeyBase64 from "../crypto/exportPrivateKeyBase64"
 import exportPublicKeyBase64 from "../crypto/exportPublicKeyBase64"
 import generateKeyPair from "../crypto/generateKeyPair"
@@ -22,33 +23,42 @@ const joinVault = async (wallet: Wallet, connectedAddress: string, vaultAddress:
     await wallet.getPublicKeyBase64(connectedAddress), // encrypt with wallet
     privateKeyBase64 // the data
   )
-
-
   console.debug('private key of key pair encrypted with wallet!')
 
-  // joining vault
-  // TODO call Vault#joinVault with encryptedPrivateKeyBase64 and publicKeyBase64
-  console.log(encryptedPrivateKeyBase64, publicKeyBase64)
-
-  joinWithVaultKeyPair(wallet, encryptedPrivateKeyBase64, publicKeyBase64, vaultAddress);
+  await joinWithVaultKeyPair(wallet, encryptedPrivateKeyBase64, publicKeyBase64, vaultAddress);
 }
-// this will accept the key pair from the smart contract
-// need to serliaze as string to pass to contract
-const joinWithVaultKeyPair = async (wallet: Wallet, privateKey: EthEncryptedData, publicKey: string, vaultAddress: string): Promise<void> => {
+
+const joinWithVaultKeyPair = async (
+  wallet: Wallet,
+  encryptedPrivateKey: EthEncryptedData,
+  publicKey: string,
+  vaultAddress: string
+): Promise<void> => {
   console.debug('joining vault with key pair...');
+
   // get provider and then signer from current wallet
   const provider = await wallet.getProvider();
+  // TODO deal with chain id?
+
   const signer = provider.getSigner()
-  const vaultContract = getVaultContract(vaultAddress);
+  const vaultContract = await getVaultContract(wallet, vaultAddress);
+
   // convert ethEncryptedData to string
-  const stringifiedPrivateKey = JSON.stringify(privateKey);
-  console.log()
+  const encryptedPrivateKeyStr = encryptedPrivateKeyToString(encryptedPrivateKey);
+  
   // pass fresh keys to vault
-  const tx = await vaultContract.connect(signer).joinVault(stringifiedPrivateKey, publicKey);
+  const tx = await vaultContract.connect(signer).joinVault(encryptedPrivateKeyStr, publicKey);
+  console.debug(`join vault transaction hash:`, tx.hash)
 
-  console.log('Joined vault with key pair: ', tx);
+  // wait on block confirmations
+  const receipt = await tx.wait()
 
-  console.debug('vault joined!');
+  // status 1 means transaction successful, see: https://docs.ethers.io/v5/api/providers/types/#providers-TransactionResponse
+  if (receipt.status !== 1) {
+    throw new Error(`expected receipt status to be 1, but was: ${receipt.status}`)
+  }
+
+  console.debug('joined vault!');
 }
 
 export default joinVault

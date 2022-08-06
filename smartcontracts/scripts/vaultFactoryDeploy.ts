@@ -1,65 +1,75 @@
-import { ethers } from "ethers";
+import hre, { ethers } from "hardhat";
 import "dotenv/config";
 import * as VaultFactory from "../artifacts/contracts/VaultFactory.sol/VaultFactory.json";
 
-if (process.env.PRIVATE_KEY === "" || process.env.MNEMONIC === "") {
-  console.warn("Must provide PRIVATE_KEY or MNEMONIC environment variable");
-  process.exit(1);
-}
+// NOTE: use env var HARDHAT_NETWORK to switch between one of the configurations defined in hardhat.config.ts
+//       e.g.: `HARDHAT_NETWORK=localhost ts-node scripts/vaultFactoryDeploy.ts`
+//       docs: https://hardhat.org/hardhat-runner/docs/advanced/scripts
 
-if (process.env.INFURA_PROJECT_ID === "") {
-  console.warn("Must provide INFURA_PROJECT_ID environment variable");
-  process.exit(1);
+// log selected configuration
+console.log(`selected configuration: ${hre.network.name}`);
+
+// log available configurations
+const confs = Object.keys(hre.config.networks).join(", ");
+console.log(`\tavailable configurations: ${confs}`);
+// eslint-disable-next-line prettier/prettier
+console.log(`\texample usage: HARDHAT_NETWORK=ropsten ts-node scripts/vaultFactoryDeploy.ts`);
+
+// helpful error messages
+if (!["hardhat", "localhost"].includes(hre.network.name)) {
+  // verify private key is configured
+  if (!process.env.PRIVATE_KEY?.trim()) {
+    console.error("ERROR: env var PRIVATE_KEY not provided");
+    process.exit(1);
+  }
+
+  // verify infura is configured
+  if (!process.env.ROPSTEN_URL?.trim()) {
+    console.error("ERROR: env var ROPSTEN_URL not provided");
+    process.exit(1);
+  }
 }
 
 async function main() {
-  //  Create wallet
-  const wallet =
-    process.env.MNEMONIC && process.env.MNEMONIC.length > 0
-      ? ethers.Wallet.fromMnemonic(process.env.MNEMONIC)
-      : new ethers.Wallet(process.env.PRIVATE_KEY!);
+  // (re)compile contracts
+  await hre.run("compile");
 
-  console.log(`Using address ${wallet.address}`);
+  // get signers
+  const signers = await ethers.getSigners();
 
-  //  Create provider and use Infura as provider
-  const provider = new ethers.providers.InfuraProvider(
-    "ropsten",
-    process.env.INFURA_PROJECT_ID
-  );
+  // get first signer
+  const firstSigner = signers[0];
+  console.log(`signer address: ${firstSigner.address}`);
 
-  //  Create signer - connect wallet to provider
-  const signer = wallet.connect(provider);
+  // get account balance
+  const balanceBN = await firstSigner.getBalance();
+  console.log(`signer balance (BigNumber): ${balanceBN}`);
 
-  //  Get account balance
-  const balanceBN = await signer.getBalance();
-  console.log(`balanceBN ${balanceBN}`);
-
-  //  Format balance to ether
+  // format balance to ether
   const balance = Number(ethers.utils.formatEther(balanceBN));
-  console.log(`Wallet balance ${balance}`);
+  console.log(`signer balance (ETH): ${balance}`);
 
   if (balance < 0.01) {
     throw new Error("Not enough ether");
   }
-  console.log("Deploying Vault Factory Contract");
 
-  //  Use ABI, bytecode and signer to create contract factory
-  const vaultFactory = new ethers.ContractFactory(
+  // create factory for contract: VaultFactory
+  const vaultFactoryFactory = new ethers.ContractFactory(
     VaultFactory.abi,
     VaultFactory.bytecode,
-    signer
+    firstSigner
   );
 
-  //  Deploy NFTen contract
-  const vaultFactoryContract = await vaultFactory.deploy();
-  console.log("Awaiting confirmations");
+  // deploy contract: VaultFactory
+  console.log("deploying VaultFactory...");
+  const vaultFactoryContract = await vaultFactoryFactory.deploy();
 
-  //  Wait for block confirmations
+  // wait for confirmations
+  console.log("awaiting confirmations...");
   await vaultFactoryContract.deployed();
-  console.log("Completed");
-  console.log(
-    `Vault Factory Contract deployed at ${vaultFactoryContract.address}`
-  );
+  console.log("completed!");
+
+  console.log(`VaultFactory deployed at ${vaultFactoryContract.address}`);
 }
 
 main().catch((error) => {

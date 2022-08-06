@@ -2,7 +2,7 @@ interface Props {
   children?: React.ReactNode 
 }
 
-const Frame = ({children}: Props) => {
+const OldFrame = ({children}: Props) => {
   return (
     <div className="h-full align-center">
       <div className="flex items-center align-center p-0">
@@ -14,4 +14,4 @@ const Frame = ({children}: Props) => {
   )
 }
 
-export default Frame
+export default OldFrame

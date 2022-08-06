@@ -1,5 +1,8 @@
 import { EthEncryptedData } from "@metamask/eth-sig-util";
+import { ethers } from "ethers";
 
+// MetaMask RPC docs: https://docs.metamask.io/guide/rpc-api.html#rpc-api
+// Ethereum RPC docs: https://ethereum.github.io/execution-apis/api-documentation/
 export default interface Wallet {
 
   /**
@@ -27,16 +30,31 @@ export default interface Wallet {
    */
   removeAddressChangeListener(callback: (newAddress: string | undefined) => void): void
 
-  // TODO
+  /**
+   * Get from this wallet the public key of a given address (that can be used for encryption).
+   * @param address the address for which the public key should be retrieved.
+   */
   getPublicKeyBase64(address: string): Promise<string>;
 
-  // TODO
+  /**
+   * Encrypt a message with a public key (obtained from {@link getPublicKeyBase64}).
+   * The public key may come from an address that the current user controls, or from one of their peers.
+   * @param publicKeyBase64 the public key, encoded in base64.
+   * @param message the message that should be encrypted with the public key.
+   */
   encryptWithPublicKey(publicKeyBase64: string, message: string): Promise<EthEncryptedData>;
 
-  // TODO
+  /**
+   * Decrypt a message with this wallet.
+   * @param address the address that should be used for decryption. Note that this address
+   *                should belog to the current user, else the operation will fail.
+   * @param encryptedData the data that should be decrypted.
+   */
   decryptWithPrivateKey(address: string, encryptedData: EthEncryptedData): Promise<string>;
 
-  // TODO
-  createTransaction(address: string, rawData: string): Promise<string>;
+  /**
+   * Get the ethers.js provider.
+   */
+  getProvider(): Promise<ethers.providers.JsonRpcProvider>;
   
 }

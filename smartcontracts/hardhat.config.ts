@@ -30,10 +30,9 @@ const config: HardhatUserConfig = {
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
-    rinkeby: {
-      url: process.env.RINKEBY_URL || "",
-      accounts:
-        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    hardhat: {
+      // fix issue with metamask chain id, see: https://hardhat.org/hardhat-network/docs/metamask-issue
+      chainId: 1337,
     },
   },
   gasReporter: {

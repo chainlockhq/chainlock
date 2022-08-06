@@ -1,6 +1,6 @@
 import { useState } from "react";
-import Wallet from "../../objects/Wallet.interface"
-import lock from "../../utils/hooks/lock";
+import Wallet from "../../../objects/Wallet.interface"
+import lock from "../../../utils/hooks/lock";
 import Address from "../atoms/Address";
 import Button from "../atoms/Button";
 

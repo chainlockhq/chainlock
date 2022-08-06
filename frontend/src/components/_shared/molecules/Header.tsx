@@ -1,4 +1,3 @@
-import FrameLogo from "../atoms/FrameLogo"
 import HeaderCurrentVault from "./HeaderCurrentVault"
 import HeaderCurrentWallet from "./HeaderCurrentWallet"
 

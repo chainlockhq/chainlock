@@ -1,6 +1,7 @@
-import getDeterministicAddressName from "../../utils/getDeterministicAddressName"
-import isAddress from "../../utils/isAddress"
-import substringAfter from "../../utils/substring-after"
+import getDeterministicAddressName from "../../../utils/getDeterministicAddressName"
+import isAddress from "../../../utils/isAddress"
+import substringAfter from "../../../utils/substring-after"
+import getAddressUrl from "../../../utils/urls/get-address-url"
 
 interface Props {
   children: string
@@ -43,7 +44,7 @@ const Address = ({
     return (
       <a
         className="font-medium hover:underline cursor-default hover:cursor-pointer"
-        href={`https://etherscan.io/address/0x${bareUppercaseAddress}`}
+        href={getAddressUrl(bareUppercaseAddress)}
         target="_blank" rel="noreferrer"
       >{getLabel(shortAddress, name)}</a>
     )

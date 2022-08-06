@@ -18,6 +18,12 @@ const FirstVaultController = ({ wallet, connectedAddress }: Props) => {
   const [createdVaultAddress, setCreatedVaultAddress] = useState<string>()
   const [creationFailed, setCreationFailed] = useState(false)
 
+  const resetToLanding = () => {
+    setCreationInProgress(false)
+    setCreatedVaultAddress(undefined)
+    setCreationFailed(false)
+  }
+
   const createVault = () => {
     lock(setCreationInProgress, async () => {
       console.debug('creating new vault...')
@@ -67,8 +73,7 @@ const FirstVaultController = ({ wallet, connectedAddress }: Props) => {
   }
 
   if (creationFailed) {
-    return <FirstVaultCreationError/>
-    // TODO button so we can go back to "FirstVaultLanding"
+    return <FirstVaultCreationError onReset={resetToLanding}/>
   }
 
   if (!createdVaultAddress) {

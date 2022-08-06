@@ -1,4 +1,5 @@
 import { encrypt, EthEncryptedData } from "@metamask/eth-sig-util";
+import { ethers } from "ethers";
 import { RawMetamask } from "../hooks/useRawMetamask";
 import Ref from "./Ref";
 import Wallet from "./Wallet.interface";
@@ -114,6 +115,13 @@ export default class MetamaskWallet implements Wallet {
     })
     return Promise.resolve(message);
   }
+
+  /**
+   * Get the ethers.js provider.
+   */
+  async getProvider(): Promise<ethers.providers.JsonRpcProvider> {
+    return new ethers.providers.Web3Provider(this.mm);
+  };
 
   getMetamaskObj(): RawMetamask {
     return this.mm;

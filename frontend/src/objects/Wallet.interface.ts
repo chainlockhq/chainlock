@@ -1,4 +1,5 @@
 import { EthEncryptedData } from "@metamask/eth-sig-util";
+import { ethers } from "ethers";
 
 // MetaMask RPC docs: https://docs.metamask.io/guide/rpc-api.html#rpc-api
 // Ethereum RPC docs: https://ethereum.github.io/execution-apis/api-documentation/
@@ -50,5 +51,10 @@ export default interface Wallet {
    * @param encryptedData the data that should be decrypted.
    */
   decryptWithPrivateKey(address: string, encryptedData: EthEncryptedData): Promise<string>;
+
+  /**
+   * Get the ethers.js provider.
+   */
+  getProvider(): Promise<ethers.providers.JsonRpcProvider>;
   
 }

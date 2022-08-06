@@ -44,10 +44,10 @@ const FirstVaultController = ({ wallet, connectedAddress, onVaultCreated }: Prop
     }
   }
 
-  const onJoinVault = async (vaultAddress?: string) => {
+  const onJoinVault = async (vaultAddress: string) => {
     try {
       setStep('vault-joining-in-progress')
-      await joinVault(wallet, connectedAddress, vaultAddress!)
+      await joinVault(wallet, connectedAddress, vaultAddress)
       setStep('vault-joining-succeeded')
     } catch(e) {
       console.error('onJoinVault failed:', e)

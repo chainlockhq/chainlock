@@ -1,6 +1,8 @@
 import { useState } from "react"
 import Wallet from "../../objects/Wallet.interface"
 import getVaultFactoryContract from "../../utils/contracts/getVaultFactoryContract"
+import exportPrivateKeyBase64 from "../../utils/crypto/exportPrivateKeyBase64"
+import exportPublicKeyBase64 from "../../utils/crypto/exportPublicKeyBase64"
 import lock from "../../utils/hooks/lock"
 import getTransactionUrl from "../../utils/urls/get-transaction-url"
 import FirstVaultCreated from "./FirstVaultCreated"
@@ -84,8 +86,35 @@ const FirstVaultController = ({ wallet, connectedAddress }: Props) => {
 
   const joinVault = () => {
     lock(setJoiningInProgress, async () => {
+      console.debug('joining vault...')
+
+      // generating fresh key pair
+      console.debug('generating fresh key pair...')
+      // TODO move to its own function
+      const kp = await window.crypto.subtle.generateKey({
+        name: "RSA-OAEP",
+        modulusLength: 4096,
+        publicExponent: new Uint8Array([1, 0, 1]),
+        hash: "SHA-256"
+      }, true, ["encrypt", "decrypt"])
+      console.debug('key pair generated!')
+
+      const privateKeyBase64 = await exportPrivateKeyBase64(kp);
+      const publicKeyBase64 = await exportPublicKeyBase64(kp);
+
+      // encrypting private key with wallet
+      console.debug('encrypting private key of key pair...')
+      const encryptedPrivateKeyBase64 = await wallet.encryptWithPublicKey(
+        await wallet.getPublicKeyBase64(connectedAddress), // encrypt with wallet
+        privateKeyBase64 // the data
+      )
+      console.debug('private key of key pair encrypted with wallet!')
+
+      // joining vault
+      // TODO call Vault#joinVault with encryptedPrivateKeyBase64 and publicKeyBase64
+      console.log(encryptedPrivateKeyBase64, publicKeyBase64)
+
       // TODO
-      console.log("joining...")
       setJoiningStatus(true)
     }).catch(e => {
       console.error('failed to join vault:', e)

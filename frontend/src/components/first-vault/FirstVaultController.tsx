@@ -1,12 +1,7 @@
 import { useState } from "react"
 import Wallet from "../../objects/Wallet.interface"
 import createVault from "../../utils/contracts/createVault"
-import getVaultFactoryContract from "../../utils/contracts/getVaultFactoryContract"
 import joinVault from "../../utils/contracts/joinVault"
-import exportPrivateKeyBase64 from "../../utils/crypto/exportPrivateKeyBase64"
-import exportPublicKeyBase64 from "../../utils/crypto/exportPublicKeyBase64"
-import lock from "../../utils/hooks/lock"
-import getTransactionUrl from "../../utils/urls/get-transaction-url"
 import FirstVaultCreated from "./FirstVaultCreated"
 import FirstVaultCreationError from "./FirstVaultCreationError"
 import FirstVaultCreationInProgress from "./FirstVaultCreationInProgress"
@@ -15,78 +10,68 @@ import FirstVaultJoiningError from "./FirstVaultJoiningError"
 import FirstVaultJoiningInProgress from "./FirstVaultJoiningInProgress"
 import FirstVaultLanding from "./FirstVaultLanding"
 
+type Step = 'landing' | 'vault-creation-in-progress' | 'vault-creation-failed' | 'vault-creation-succeeded' |
+            'vault-joining-in-progress' | 'vault-joining-failed' | 'vault-joining-succeeded'
+
 interface Props {
   wallet: Wallet
   connectedAddress: string
 }
 
 const FirstVaultController = ({ wallet, connectedAddress }: Props) => {
-  // TODO refactor as FSM, only real data is the vault address...
-  const [creationInProgress, setCreationInProgress] = useState(false)
+  const [step, setStep] = useState<Step>('landing')
   const [createdVaultAddress, setCreatedVaultAddress] = useState<string>()
-  const [creationFailed, setCreationFailed] = useState(false)
-  const [joiningInProgress, setJoiningInProgress] = useState(false)
-  const [joiningStatus, setJoiningStatus] = useState<boolean | null>(null)
 
   const resetToCreation = () => {
-    setCreationInProgress(false)
+    setStep('landing')
     setCreatedVaultAddress(undefined)
-    setCreationFailed(false)
-    setJoiningInProgress(false)
-    setJoiningStatus(null)
   }
 
   const resetToJoining = () => {
-    setJoiningInProgress(false)
-    setJoiningStatus(null)
+    setStep('vault-creation-succeeded')
   }
 
-  const onCreateVault = () => {
-    lock(setCreationInProgress, async () => {
+  const onCreateVault = async () => {
+    try {
+      setStep('vault-creation-in-progress')
       const vaultAddress = await createVault(wallet)
       setCreatedVaultAddress(vaultAddress)
-    }).catch(e => {
+      setStep('vault-creation-succeeded')
+    } catch(e) {
       console.error('onCreateVault failed:', e)
-      setCreationFailed(true)
-    })
+      setStep('vault-creation-failed')
+    }
   }
 
-  const onJoinVault = () => {
-    lock(setJoiningInProgress, async () => {
+  const onJoinVault = async () => {
+    try {
+      setStep('vault-joining-in-progress')
       await joinVault(wallet, connectedAddress)
-      setJoiningStatus(true)
-    }).catch(e => {
+      setStep('vault-joining-succeeded')
+    } catch(e) {
       console.error('onJoinVault failed:', e)
-      setJoiningStatus(false)
-    })
+      setStep('vault-joining-failed')
+    }
   }
 
-  if (creationInProgress) {
-    return <FirstVaultCreationInProgress/>
+  switch(step) {
+    case 'landing':
+      return <FirstVaultLanding onClick={onCreateVault}/>
+    case 'vault-creation-in-progress':
+      return <FirstVaultCreationInProgress/>
+    case 'vault-creation-failed':
+      return <FirstVaultCreationError onReset={resetToCreation}/>
+    case 'vault-creation-succeeded':
+      return <FirstVaultCreated vaultAddress={createdVaultAddress!} onJoinVault={onJoinVault}/>
+    case 'vault-joining-in-progress':
+      return <FirstVaultJoiningInProgress/>
+    case 'vault-joining-failed':
+      return <FirstVaultJoiningError onReset={resetToJoining}/>
+    case 'vault-joining-succeeded':
+      return <FirstVaultJoined/>
+    default:
+      throw new Error(`step '${step}' is not supported`)
   }
-
-  if (joiningInProgress) {
-    return <FirstVaultJoiningInProgress/>
-  }
-
-  if (creationFailed) {
-    return <FirstVaultCreationError onReset={resetToCreation}/>
-  }
-
-  if (joiningStatus === false) {
-    return <FirstVaultJoiningError onReset={resetToJoining}/>
-  }
-
-  if (joiningStatus === true) {
-    return <FirstVaultJoined/>
-  }
-
-  if (!createdVaultAddress) {
-    return <FirstVaultLanding onClick={onCreateVault}/>
-  }
-
-  return <FirstVaultCreated vaultAddress={createdVaultAddress} onJoinVault={onJoinVault}/>
-
 }
 
 export default FirstVaultController

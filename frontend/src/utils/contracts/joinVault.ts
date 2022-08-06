@@ -1,19 +1,14 @@
 import Wallet from "../../objects/Wallet.interface"
 import exportPrivateKeyBase64 from "../crypto/exportPrivateKeyBase64"
 import exportPublicKeyBase64 from "../crypto/exportPublicKeyBase64"
+import generateKeyPair from "../crypto/generateKeyPair"
 
 const joinVault = async (wallet: Wallet, connectedAddress: string): Promise<void> => {
   console.debug('joining vault...')
 
   // generating fresh key pair
   console.debug('generating fresh key pair...')
-  // TODO move to its own function?
-  const kp = await window.crypto.subtle.generateKey({
-    name: "RSA-OAEP",
-    modulusLength: 4096,
-    publicExponent: new Uint8Array([1, 0, 1]),
-    hash: "SHA-256"
-  }, true, ["encrypt", "decrypt"])
+  const kp = await generateKeyPair();
   console.debug('key pair generated!')
 
   const privateKeyBase64 = await exportPrivateKeyBase64(kp);

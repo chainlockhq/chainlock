@@ -10,19 +10,20 @@ import FirstVaultLanding from "./FirstVaultLanding"
 interface Props {
   wallet: Wallet
   connectedAddress: string
+  onVaultCreation?: any
 }
 
-const FirstVaultController = ({ wallet, connectedAddress }: Props) => {
+const FirstVaultController = ({ wallet, connectedAddress, onVaultCreation }: Props) => {
   const [creationInProgress, setCreationInProgress] = useState(false)
   const [createdVaultAddress, setCreatedVaultAddress] = useState<string>()
 
   const createVault = () => {
     lock(setCreationInProgress, async () => {
-      console.debug('creating new vault...')
+      console.debug("creating new vault...")
 
       const provider = await wallet.getProvider()
       const network = await provider.getNetwork()
-      console.debug('chain id:', network.chainId)
+      console.debug("chain id:", network.chainId)
       // TODO compare with process.env.REACT_APP_CHAIN_ID
       // TODO ask to switch chains? https://soliditytips.com/articles/detect-switch-chain-metamask/
 
@@ -33,29 +34,30 @@ const FirstVaultController = ({ wallet, connectedAddress }: Props) => {
       console.debug(`contract creation transaction hash:`, tx.hash)
 
       const receipt = await tx.wait()
-      console.debug('transaction status:', receipt.status)
+      console.debug("transaction status:", receipt.status)
 
       // TODO below may fail => wrong contract / contract not deployed?
-      const [vaultAddress] = receipt.events[0].args
-
+      const [creatorAddress, vaultAddress] = receipt.events[0].args
       console.debug(`vault created!`)
       console.debug(`address:`, vaultAddress)
       console.debug(`view transaction:`, getTransactionUrl(tx.hash))
 
       setCreatedVaultAddress(vaultAddress)
+      const newVaultAddress = []
+      newVaultAddress.push(vaultAddress)
+      onVaultCreation(newVaultAddress)
     })
   }
 
   if (creationInProgress) {
-    return <FirstVaultInProgress/>
+    return <FirstVaultInProgress />
   }
 
   if (!createdVaultAddress) {
-    return <FirstVaultLanding onClick={createVault}/>
+    return <FirstVaultLanding onClick={createVault} />
   }
 
-  return <FirstVaultCreated vaultAddress={createdVaultAddress}/>
-
+  return <FirstVaultCreated vaultAddress={createdVaultAddress} />
 }
 
 export default FirstVaultController

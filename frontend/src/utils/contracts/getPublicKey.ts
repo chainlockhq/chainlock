@@ -1,22 +1,26 @@
 import Wallet from "../../objects/Wallet.interface"
+import isBlank from "../is-blank";
 import getVaultContract from "./getVaultContract";
 
+// TODO contains error somewhere
 const getPublicKey = async (wallet: Wallet, vaultAddress: string, memberAddress: string): Promise<string> => {
   console.debug(`getting public key of address ${memberAddress} from vault ${vaultAddress}...`)
 
   const provider = await wallet.getProvider();
   const network = await provider.getNetwork()
   console.debug('chain id:', network.chainId)
-  // TODO compare with process.env.REACT_APP_CHAIN_ID
-  // TODO ask to switch chains? https://soliditytips.com/articles/detect-switch-chain-metamask/
+  // TODO deal with chain id?
 
-  // TODO handle situation where eth node is not available
+  const vaultContract = await getVaultContract(wallet, vaultAddress)
 
-  const vaultContract = await getVaultContract(wallet, vaultAddress);
+  const publicKey = await vaultContract.getPublicKey(memberAddress)
+  if (isBlank(publicKey)) {
+    throw new Error(`public key for address ${memberAddress} in ${vaultAddress} is blank`)
+  }
 
-  // TODO
-  vaultContract.getPublicKey(vaultAddress)
-  throw new Error('TODO implement')
+  console.debug(`public key of address ${memberAddress} is ${publicKey}`)
+
+  return publicKey
 }
 
 export default getPublicKey

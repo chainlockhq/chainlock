@@ -1,9 +1,12 @@
+import { EthEncryptedData } from "@metamask/eth-sig-util"
 import Wallet from "../../objects/Wallet.interface"
+import encryptedPrivateKeyToString from "../crypto/encryptedPrivateKeyToString"
 import exportPrivateKeyBase64 from "../crypto/exportPrivateKeyBase64"
 import exportPublicKeyBase64 from "../crypto/exportPublicKeyBase64"
 import generateKeyPair from "../crypto/generateKeyPair"
+import getVaultContract from "./getVaultContract"
 
-const joinVault = async (wallet: Wallet, connectedAddress: string): Promise<void> => {
+const joinVault = async (wallet: Wallet, connectedAddress: string, vaultAddress: string): Promise<void> => {
   console.debug('joining vault...')
 
   // generating fresh key pair
@@ -22,9 +25,40 @@ const joinVault = async (wallet: Wallet, connectedAddress: string): Promise<void
   )
   console.debug('private key of key pair encrypted with wallet!')
 
-  // joining vault
-  // TODO call Vault#joinVault with encryptedPrivateKeyBase64 and publicKeyBase64
-  console.log(encryptedPrivateKeyBase64, publicKeyBase64)
+  await joinWithVaultKeyPair(wallet, encryptedPrivateKeyBase64, publicKeyBase64, vaultAddress);
+}
+
+const joinWithVaultKeyPair = async (
+  wallet: Wallet,
+  encryptedPrivateKey: EthEncryptedData,
+  publicKey: string,
+  vaultAddress: string
+): Promise<void> => {
+  console.debug('joining vault with key pair...');
+
+  // get provider and then signer from current wallet
+  const provider = await wallet.getProvider();
+  // TODO deal with chain id?
+
+  const signer = provider.getSigner()
+  const vaultContract = await getVaultContract(wallet, vaultAddress);
+
+  // convert ethEncryptedData to string
+  const encryptedPrivateKeyStr = encryptedPrivateKeyToString(encryptedPrivateKey);
+  
+  // pass fresh keys to vault
+  const tx = await vaultContract.connect(signer).joinVault(encryptedPrivateKeyStr, publicKey);
+  console.debug(`join vault transaction hash:`, tx.hash)
+
+  // wait on block confirmations
+  const receipt = await tx.wait()
+
+  // status 1 means transaction successful, see: https://docs.ethers.io/v5/api/providers/types/#providers-TransactionResponse
+  if (receipt.status !== 1) {
+    throw new Error(`expected receipt status to be 1, but was: ${receipt.status}`)
+  }
+
+  console.debug('joined vault!');
 }
 
 export default joinVault

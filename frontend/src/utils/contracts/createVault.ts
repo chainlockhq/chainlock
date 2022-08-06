@@ -20,8 +20,8 @@ const createVault = async (wallet: Wallet): Promise<string> => {
   const tx = await vaultFactoryContract.connect(signer).createVault()
   console.debug(`contract creation transaction hash:`, tx.hash)
 
+  // wait on block confirmations
   const receipt = await tx.wait()
-  console.debug('transaction status:', receipt.status)
 
   // status 1 means transaction successful, see: https://docs.ethers.io/v5/api/providers/types/#providers-TransactionResponse
   if (receipt.status !== 1) {

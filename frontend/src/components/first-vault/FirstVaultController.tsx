@@ -1,6 +1,4 @@
-import { ENGINE_METHOD_CIPHERS } from "constants"
-import Frame from "../_shared/atoms/Frame"
-import FrameLogo from "../_shared/atoms/FrameLogo"
+import OldFrame from "../_shared/atoms/OldFrame"
 import FrameMessage from "../_shared/atoms/FrameMessage"
 import Wallet from "../../objects/Wallet.interface"
 import { ethers } from "ethers"
@@ -94,11 +92,11 @@ const FirstVaultController = ({ wallet, connectedAddress }: Props) => {
       <div className="bg-[#2b3f4a] h-screen grid grid-flex grid-cols-3 gap-6">
         <div></div>
         <div className="text-white text-center">
-          <Frame>
+          <OldFrame>
             <FrameMessage>
               <p>Creating the New Vault. Waiting for confirmation....</p>
             </FrameMessage>
-          </Frame>
+          </OldFrame>
         </div>
         <div></div>
       </div>
@@ -111,7 +109,7 @@ const FirstVaultController = ({ wallet, connectedAddress }: Props) => {
       <div className="bg-[#2b3f4a] h-screen grid grid-flex grid-cols-3 gap-6">
         <div></div>
         <div className="text-white text-center">
-          <Frame>
+          <OldFrame>
             <FrameMessage>
               <p>New Vault created!</p>
               <p>
@@ -123,7 +121,7 @@ const FirstVaultController = ({ wallet, connectedAddress }: Props) => {
                 <a href={vaultAddressUrl}>{vaultAddressUrl}</a>
               </p>
             </FrameMessage>
-          </Frame>
+          </OldFrame>
         </div>
         <div></div>
       </div>
@@ -133,7 +131,7 @@ const FirstVaultController = ({ wallet, connectedAddress }: Props) => {
     <div className="bg-[#2b3f4a] h-screen grid grid-flex grid-cols-3 gap-6">
       <div></div>
       <div className="text-white text-center">
-        <Frame>
+        <OldFrame>
           <FrameMessage>
             <p className="text-5xl font-bold mb-6">Welcome</p>
             <p>Create your first vault</p>
@@ -141,7 +139,7 @@ const FirstVaultController = ({ wallet, connectedAddress }: Props) => {
               Create vault
             </button>
           </FrameMessage>
-        </Frame>
+        </OldFrame>
       </div>
       <div></div>
     </div>

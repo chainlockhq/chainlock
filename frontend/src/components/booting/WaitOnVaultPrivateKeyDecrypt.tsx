@@ -1,7 +1,6 @@
 import Address from "../_shared/atoms/Address"
 import Button from "../_shared/atoms/Button"
-import Frame from "../_shared/atoms/Frame"
-import FrameLogo from "../_shared/atoms/FrameLogo"
+import OldFrame from "../_shared/atoms/OldFrame"
 import FrameMessage from "../_shared/atoms/FrameMessage"
 
 interface Props {
@@ -22,7 +21,7 @@ const WaitOnVaultPrivateKeyDecrypt = ({onBack, vaultAddress}: Props) => {
 
       </div>
       <div className="">
-      <Frame>
+      <OldFrame>
       <FrameMessage>
         <div className="mb-20 text-small p-10 bg-white rounded-xl drop-shadow-lg">
           <div className="mb-6">
@@ -76,7 +75,7 @@ const WaitOnVaultPrivateKeyDecrypt = ({onBack, vaultAddress}: Props) => {
         {onBack && (<p className="mt-2"><Button onClick={() =>onBack()}>back</Button></p>)}
       </div>
       </FrameMessage>
-    </Frame>
+    </OldFrame>
     </div>
     <div>
 

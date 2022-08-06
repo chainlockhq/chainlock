@@ -1,8 +1,7 @@
 import useAddress from "../../hooks/useAddress"
 import Wallet from "../../objects/Wallet.interface"
 import Address from "../_shared/atoms/Address"
-import Frame from "../_shared/atoms/Frame"
-import FrameLogo from "../_shared/atoms/FrameLogo"
+import OldFrame from "../_shared/atoms/OldFrame"
 import FrameMessage from "../_shared/atoms/FrameMessage"
 import WalletButton from "../_shared/molecules/WalletButton"
 import vaultImage from "../../images/vault.png"
@@ -38,7 +37,7 @@ const ConnectMetamask = ({wallet, connectedAddress, onConnect}: Props) => {
             <p className="font-medium  text-[#333] text-l mt-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
           </div>
           <div className="mt-0">
-            <Frame>
+            <OldFrame>
               <FrameMessage>
                 <WalletButton
                 wallet={wallet}
@@ -59,7 +58,7 @@ const ConnectMetamask = ({wallet, connectedAddress, onConnect}: Props) => {
                 </>
                 )}
               </FrameMessage>
-            </Frame>
+            </OldFrame>
           </div>
         </div>
         <div className="img-background flex justify-center pt-10 hidden md:block">

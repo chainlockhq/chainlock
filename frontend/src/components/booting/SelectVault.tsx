@@ -1,7 +1,5 @@
-import { SocketAddress } from "net"
 import Address from "../_shared/atoms/Address"
-import Frame from "../_shared/atoms/Frame"
-import FrameLogo from "../_shared/atoms/FrameLogo"
+import OldFrame from "../_shared/atoms/OldFrame"
 import FrameMessage from "../_shared/atoms/FrameMessage"
 
 interface Props {
@@ -29,7 +27,7 @@ const SelectVault = ({address, vaultAddresses, onSelect}: Props) => {
         </div>
       </div>
       <div className="mt-20 text-black  flex justify-center items-center">
-      <Frame>
+      <OldFrame>
       <FrameMessage>
         <select
           className="mb-4 bg-white rounded-md px-2 py-1 min-w-[50%] max-w-full font-mono"
@@ -44,7 +42,7 @@ const SelectVault = ({address, vaultAddresses, onSelect}: Props) => {
           ))}
         </select>
       </FrameMessage>
-    </Frame>
+    </OldFrame>
       </div>
       <div className="">
         <p className=""><Address named>{address}</Address></p>

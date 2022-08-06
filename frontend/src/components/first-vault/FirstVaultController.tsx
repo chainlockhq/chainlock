@@ -5,7 +5,10 @@ import lock from "../../utils/hooks/lock"
 import getTransactionUrl from "../../utils/urls/get-transaction-url"
 import FirstVaultCreated from "./FirstVaultCreated"
 import FirstVaultCreationError from "./FirstVaultCreationError"
-import FirstVaultInProgress from "./FirstVaultInProgress"
+import FirstVaultCreationInProgress from "./FirstVaultCreationInProgress"
+import FirstVaultJoined from "./FirstVaultJoined"
+import FirstVaultJoiningError from "./FirstVaultJoiningError"
+import FirstVaultJoiningInProgress from "./FirstVaultJoiningInProgress"
 import FirstVaultLanding from "./FirstVaultLanding"
 
 interface Props {
@@ -14,14 +17,24 @@ interface Props {
 }
 
 const FirstVaultController = ({ wallet, connectedAddress }: Props) => {
+  // TODO refactor as FSM, only real data is the vault address...
   const [creationInProgress, setCreationInProgress] = useState(false)
   const [createdVaultAddress, setCreatedVaultAddress] = useState<string>()
   const [creationFailed, setCreationFailed] = useState(false)
+  const [joiningInProgress, setJoiningInProgress] = useState(false)
+  const [joiningStatus, setJoiningStatus] = useState<boolean | null>(null)
 
-  const resetToLanding = () => {
+  const resetToCreation = () => {
     setCreationInProgress(false)
     setCreatedVaultAddress(undefined)
     setCreationFailed(false)
+    setJoiningInProgress(false)
+    setJoiningStatus(null)
+  }
+
+  const resetToJoining = () => {
+    setJoiningInProgress(false)
+    setJoiningStatus(null)
   }
 
   const createVault = () => {
@@ -55,6 +68,7 @@ const FirstVaultController = ({ wallet, connectedAddress }: Props) => {
       // TODO handle situation where vault factory contract does NOT exist - seems to still return receipt.status = 1
 
       // TODO below may fail => wrong contract / contract not deployed?
+      console.log('receipt:', receipt)
       const [vaultAddress] = receipt.events[0].args
 
       console.debug(`vault created!`)
@@ -68,19 +82,42 @@ const FirstVaultController = ({ wallet, connectedAddress }: Props) => {
     })
   }
 
+  const joinVault = () => {
+    lock(setJoiningInProgress, async () => {
+      // TODO
+      console.log("joining...")
+      setJoiningStatus(true)
+    }).catch(e => {
+      console.error('failed to join vault:', e)
+      setJoiningStatus(false)
+    })
+  }
+
   if (creationInProgress) {
-    return <FirstVaultInProgress/>
+    return <FirstVaultCreationInProgress/>
+  }
+
+  if (joiningInProgress) {
+    return <FirstVaultJoiningInProgress/>
   }
 
   if (creationFailed) {
-    return <FirstVaultCreationError onReset={resetToLanding}/>
+    return <FirstVaultCreationError onReset={resetToCreation}/>
+  }
+
+  if (joiningStatus === false) {
+    return <FirstVaultJoiningError onReset={resetToJoining}/>
+  }
+
+  if (joiningStatus === true) {
+    return <FirstVaultJoined/>
   }
 
   if (!createdVaultAddress) {
     return <FirstVaultLanding onClick={createVault}/>
   }
 
-  return <FirstVaultCreated vaultAddress={createdVaultAddress}/>
+  return <FirstVaultCreated vaultAddress={createdVaultAddress} onJoinVault={joinVault}/>
 
 }
 

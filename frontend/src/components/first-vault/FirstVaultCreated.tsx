@@ -4,7 +4,7 @@ import Frame from "../_shared/atoms/Frame"
 
 interface Props {
   vaultAddress: string,
-  onJoinVault: () => void,
+  onJoinVault: (vaultAddress: string) => void,
 }
 
 const FirstVaultCreated = ({ vaultAddress, onJoinVault }: Props) => {
@@ -18,7 +18,7 @@ const FirstVaultCreated = ({ vaultAddress, onJoinVault }: Props) => {
         <p>
           let's add you to the vault
         </p>
-        <Button onClick={onJoinVault} className="mt-14 bg-[#e8cd8e] text-[#333] py-3 px-10 rounded-xl">join the vault</Button>
+        <Button onClick={() => onJoinVault(vaultAddress)} className="mt-14 bg-[#e8cd8e] text-[#333] py-3 px-10 rounded-xl">join the vault</Button>
       </Frame>
     </div>
   )

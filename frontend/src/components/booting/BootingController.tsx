@@ -17,9 +17,6 @@ const BootingController = () => {
   const connectWallet = useCallback((newAddress: string) => setAddress(newAddress), [setAddress])
   const disconnectWallet = useCallback(() => setAddress(undefined), [setAddress])
   const [vaultAddresses, setVaultAddresses] = useVaultAddresses(wallet, address)
-
-  const onVaultCreation = useCallback(() => setVaultAddresses([]), [setVaultAddresses])
-
   const [currentVaultAddress, setCurrentVaultAddress] = useCurrentVaultAddress(address, vaultAddresses)
   const goToVaultSelect = useCallback(() => setCurrentVaultAddress(undefined), [setCurrentVaultAddress])
   const { vaultKeyPair } = useVaultKeyPair(wallet, address, currentVaultAddress, { onDialogCancel: goToVaultSelect })
@@ -43,14 +40,18 @@ const BootingController = () => {
       <FirstVaultController
         wallet={wallet}
         connectedAddress={address}
-        onVaultCreation={(newVault: string[]) => setVaultAddresses(newVault)}
+        onVaultCreated={(newVaultAddress) => setVaultAddresses([...vaultAddresses, newVaultAddress])}
       />
     )
   }
 
   if (!currentVaultAddress) {
     return (
-      <SelectVault address={address} vaultAddresses={vaultAddresses} onSelect={(va) => setCurrentVaultAddress(va)} />
+      <SelectVault
+        address={address}
+        vaultAddresses={vaultAddresses}
+        onSelect={(va) => setCurrentVaultAddress(va)}
+      />
     )
   }
 

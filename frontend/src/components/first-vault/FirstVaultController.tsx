@@ -1,63 +1,84 @@
 import { useState } from "react"
 import Wallet from "../../objects/Wallet.interface"
-import getVaultFactoryContract from "../../utils/contracts/getVaultFactoryContract"
-import lock from "../../utils/hooks/lock"
-import getTransactionUrl from "../../utils/urls/get-transaction-url"
+import createVault from "../../utils/contracts/createVault"
+import joinVault from "../../utils/contracts/joinVault"
 import FirstVaultCreated from "./FirstVaultCreated"
-import FirstVaultInProgress from "./FirstVaultInProgress"
+import FirstVaultCreationError from "./FirstVaultCreationError"
+import FirstVaultCreationInProgress from "./FirstVaultCreationInProgress"
+import FirstVaultJoined from "./FirstVaultJoined"
+import FirstVaultJoiningError from "./FirstVaultJoiningError"
+import FirstVaultJoiningInProgress from "./FirstVaultJoiningInProgress"
 import FirstVaultLanding from "./FirstVaultLanding"
+
+type Step = 'landing' | 'vault-creation-in-progress' | 'vault-creation-failed' | 'vault-creation-succeeded' |
+            'vault-joining-in-progress' | 'vault-joining-failed' | 'vault-joining-succeeded'
 
 interface Props {
   wallet: Wallet
   connectedAddress: string
-  onVaultCreation?: any
+  onVaultCreated?: (vaultAddress: string) => void
 }
 
-const FirstVaultController = ({ wallet, connectedAddress, onVaultCreation }: Props) => {
-  const [creationInProgress, setCreationInProgress] = useState(false)
+const FirstVaultController = ({ wallet, connectedAddress, onVaultCreated }: Props) => {
+  const [step, setStep] = useState<Step>('landing')
   const [createdVaultAddress, setCreatedVaultAddress] = useState<string>()
 
-  const createVault = () => {
-    lock(setCreationInProgress, async () => {
-      console.debug("creating new vault...")
+  const resetToCreation = () => {
+    setStep('landing')
+    setCreatedVaultAddress(undefined)
+  }
 
-      const provider = await wallet.getProvider()
-      const network = await provider.getNetwork()
-      console.debug("chain id:", network.chainId)
-      // TODO compare with process.env.REACT_APP_CHAIN_ID
-      // TODO ask to switch chains? https://soliditytips.com/articles/detect-switch-chain-metamask/
+  const resetToJoining = () => {
+    setStep('vault-creation-succeeded')
+  }
 
-      const signer = provider.getSigner()
-      const vaultFactoryContract = getVaultFactoryContract()
-
-      const tx = await vaultFactoryContract.connect(signer).createVault()
-      console.debug(`contract creation transaction hash:`, tx.hash)
-
-      const receipt = await tx.wait()
-      console.debug("transaction status:", receipt.status)
-
-      // TODO below may fail => wrong contract / contract not deployed?
-      const [creatorAddress, vaultAddress] = receipt.events[0].args
-      console.debug(`vault created!`)
-      console.debug(`address:`, vaultAddress)
-      console.debug(`view transaction:`, getTransactionUrl(tx.hash))
-
+  const onCreateVault = async () => {
+    try {
+      setStep('vault-creation-in-progress')
+      const vaultAddress = await createVault(wallet)
       setCreatedVaultAddress(vaultAddress)
-      const newVaultAddress = []
-      newVaultAddress.push(vaultAddress)
-      onVaultCreation(newVaultAddress)
-    })
+      setStep('vault-creation-succeeded')
+    } catch(e) {
+      console.error('onCreateVault failed:', e)
+      setStep('vault-creation-failed')
+    }
   }
 
-  if (creationInProgress) {
-    return <FirstVaultInProgress />
+  const onJoinVault = async () => {
+    try {
+      setStep('vault-joining-in-progress')
+      await joinVault(wallet, connectedAddress)
+      setStep('vault-joining-succeeded')
+    } catch(e) {
+      console.error('onJoinVault failed:', e)
+      setStep('vault-joining-failed')
+    }
   }
 
-  if (!createdVaultAddress) {
-    return <FirstVaultLanding onClick={createVault} />
+  const onContinue = async () => {
+    if (onVaultCreated && createdVaultAddress) {
+      onVaultCreated(createdVaultAddress)
+    }
   }
 
-  return <FirstVaultCreated vaultAddress={createdVaultAddress} />
+  switch(step) {
+    case 'landing':
+      return <FirstVaultLanding onClick={onCreateVault}/>
+    case 'vault-creation-in-progress':
+      return <FirstVaultCreationInProgress/>
+    case 'vault-creation-failed':
+      return <FirstVaultCreationError onReset={resetToCreation}/>
+    case 'vault-creation-succeeded':
+      return <FirstVaultCreated vaultAddress={createdVaultAddress!} onJoinVault={onJoinVault}/>
+    case 'vault-joining-in-progress':
+      return <FirstVaultJoiningInProgress/>
+    case 'vault-joining-failed':
+      return <FirstVaultJoiningError onReset={resetToJoining}/>
+    case 'vault-joining-succeeded':
+      return <FirstVaultJoined onContinue={onContinue}/>
+    default:
+      throw new Error(`step '${step}' is not supported`)
+  }
 }
 
 export default FirstVaultController

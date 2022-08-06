@@ -13,18 +13,16 @@ import WaitOnVaultPrivateKeyDecrypt from "./WaitOnVaultPrivateKeyDecrypt"
 
 const BootingController = () => {
   const wallet = useWallet()
-  const [ address, setAddress ] = useAddress(wallet)
+  const [address, setAddress] = useAddress(wallet)
   const connectWallet = useCallback((newAddress: string) => setAddress(newAddress), [setAddress])
   const disconnectWallet = useCallback(() => setAddress(undefined), [setAddress])
-  const vaultAddresses = useVaultAddresses(wallet, address)
-  const [ currentVaultAddress, setCurrentVaultAddress ] = useCurrentVaultAddress(address, vaultAddresses)
+  const [vaultAddresses, setVaultAddresses] = useVaultAddresses(wallet, address)
+  const [currentVaultAddress, setCurrentVaultAddress] = useCurrentVaultAddress(address, vaultAddresses)
   const goToVaultSelect = useCallback(() => setCurrentVaultAddress(undefined), [setCurrentVaultAddress])
   const { vaultKeyPair } = useVaultKeyPair(wallet, address, currentVaultAddress, { onDialogCancel: goToVaultSelect })
 
   if (!wallet) {
-    return (
-      <InstallMetamask/>
-    )
+    return <InstallMetamask />
   }
 
   if (!address) {
@@ -42,6 +40,7 @@ const BootingController = () => {
       <FirstVaultController
         wallet={wallet}
         connectedAddress={address}
+        onVaultCreated={(newVaultAddress) => setVaultAddresses([...vaultAddresses, newVaultAddress])}
       />
     )
   }
@@ -51,17 +50,13 @@ const BootingController = () => {
       <SelectVault
         address={address}
         vaultAddresses={vaultAddresses}
-        onSelect={va => setCurrentVaultAddress(va)}
+        onSelect={(va) => setCurrentVaultAddress(va)}
       />
     )
   }
 
   if (!vaultKeyPair) {
-    return (
-      <WaitOnVaultPrivateKeyDecrypt
-        vaultAddress={currentVaultAddress}
-      />
-    )
+    return <WaitOnVaultPrivateKeyDecrypt vaultAddress={currentVaultAddress} />
   }
 
   return (

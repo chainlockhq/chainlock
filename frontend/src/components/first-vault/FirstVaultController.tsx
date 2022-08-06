@@ -16,9 +16,10 @@ type Step = 'landing' | 'vault-creation-in-progress' | 'vault-creation-failed' |
 interface Props {
   wallet: Wallet
   connectedAddress: string
+  onVaultCreated?: (vaultAddress: string) => void
 }
 
-const FirstVaultController = ({ wallet, connectedAddress }: Props) => {
+const FirstVaultController = ({ wallet, connectedAddress, onVaultCreated }: Props) => {
   const [step, setStep] = useState<Step>('landing')
   const [createdVaultAddress, setCreatedVaultAddress] = useState<string>()
 
@@ -55,8 +56,9 @@ const FirstVaultController = ({ wallet, connectedAddress }: Props) => {
   }
 
   const onContinue = async () => {
-    // TODO
-    console.log('continue...')
+    if (onVaultCreated && createdVaultAddress) {
+      onVaultCreated(createdVaultAddress)
+    }
   }
 
   switch(step) {

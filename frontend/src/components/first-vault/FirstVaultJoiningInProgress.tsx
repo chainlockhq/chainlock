@@ -1,13 +1,13 @@
 import Frame from "../_shared/atoms/Frame"
 
-const FirstVaultInProgress = () => {
+const FirstVaultJoiningInProgress = () => {
   return (
     <div className="bg-[#2b3f4a] h-full text-white text-center">
       <Frame>
-        <p>Creating new Vault. Waiting for confirmation...</p>
+        <p>Joining new vault...</p>
       </Frame>
     </div>
   )
 }
 
-export default FirstVaultInProgress
+export default FirstVaultJoiningInProgress

@@ -8,16 +8,17 @@ html, body, #root {
   font-family: 'Poppins', sans-serif;
 }
 
-.container-index{
+.container-index {
   background-image: linear-gradient(
     140deg,
     hsl(42deg 66% 73%) 0%,
     hsl(156deg 22% 45%) 50%,
     hsl(201deg 26% 23%) 100%
-  );}
+  );
+}
 
-  .img-background{
-    background-image: url("./images/2.png");
-    background-size:contain;
-    background-repeat: no-repeat;
-  }
+.img-background {
+  background-image: url("./images/2.png");
+  background-size:contain;
+  background-repeat: no-repeat;
+}

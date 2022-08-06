@@ -1,5 +1,4 @@
 import OldFrame from "../_shared/atoms/OldFrame"
-import FrameMessage from "../_shared/atoms/FrameMessage"
 import Wallet from "../../objects/Wallet.interface"
 import { ethers } from "ethers"
 import { useState, useEffect } from "react"
@@ -93,9 +92,7 @@ const FirstVaultController = ({ wallet, connectedAddress }: Props) => {
         <div></div>
         <div className="text-white text-center">
           <OldFrame>
-            <FrameMessage>
               <p>Creating the New Vault. Waiting for confirmation....</p>
-            </FrameMessage>
           </OldFrame>
         </div>
         <div></div>
@@ -110,17 +107,15 @@ const FirstVaultController = ({ wallet, connectedAddress }: Props) => {
         <div></div>
         <div className="text-white text-center">
           <OldFrame>
-            <FrameMessage>
-              <p>New Vault created!</p>
-              <p>
-                See transaction:
-                <a href={txUrl}>{txUrl}</a>
-              </p>
-              <p>
-                New Vault Address:
-                <a href={vaultAddressUrl}>{vaultAddressUrl}</a>
-              </p>
-            </FrameMessage>
+            <p>New Vault created!</p>
+            <p>
+              See transaction:
+              <a href={txUrl}>{txUrl}</a>
+            </p>
+            <p>
+              New Vault Address:
+              <a href={vaultAddressUrl}>{vaultAddressUrl}</a>
+            </p>
           </OldFrame>
         </div>
         <div></div>
@@ -132,13 +127,11 @@ const FirstVaultController = ({ wallet, connectedAddress }: Props) => {
       <div></div>
       <div className="text-white text-center">
         <OldFrame>
-          <FrameMessage>
-            <p className="text-5xl font-bold mb-6">Welcome</p>
-            <p>Create your first vault</p>
-            <button onClick={createVault} className="mt-14 bg-[#e8cd8e] text-[#333] py-3 px-10 rounded-xl">
-              Create vault
-            </button>
-          </FrameMessage>
+          <p className="text-5xl font-bold mb-6">Welcome</p>
+          <p>Create your first vault</p>
+          <button onClick={createVault} className="mt-14 bg-[#e8cd8e] text-[#333] py-3 px-10 rounded-xl">
+            Create vault
+          </button>
         </OldFrame>
       </div>
       <div></div>

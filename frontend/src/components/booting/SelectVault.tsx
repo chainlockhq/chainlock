@@ -1,6 +1,5 @@
 import Address from "../_shared/atoms/Address"
 import OldFrame from "../_shared/atoms/OldFrame"
-import FrameMessage from "../_shared/atoms/FrameMessage"
 
 interface Props {
   address: string
@@ -28,7 +27,6 @@ const SelectVault = ({address, vaultAddresses, onSelect}: Props) => {
       </div>
       <div className="mt-20 text-black  flex justify-center items-center">
       <OldFrame>
-      <FrameMessage>
         <select
           className="mb-4 bg-white rounded-md px-2 py-1 min-w-[50%] max-w-full font-mono"
           defaultValue={CHOOSE_A_VAULT}
@@ -41,8 +39,7 @@ const SelectVault = ({address, vaultAddresses, onSelect}: Props) => {
             </option>
           ))}
         </select>
-      </FrameMessage>
-    </OldFrame>
+      </OldFrame>
       </div>
       <div className="">
         <p className=""><Address named>{address}</Address></p>

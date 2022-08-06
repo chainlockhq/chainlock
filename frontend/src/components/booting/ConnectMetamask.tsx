@@ -2,7 +2,6 @@ import useAddress from "../../hooks/useAddress"
 import Wallet from "../../objects/Wallet.interface"
 import Address from "../_shared/atoms/Address"
 import OldFrame from "../_shared/atoms/OldFrame"
-import FrameMessage from "../_shared/atoms/FrameMessage"
 import WalletButton from "../_shared/molecules/WalletButton"
 import vaultImage from "../../images/vault.png"
 
@@ -38,26 +37,24 @@ const ConnectMetamask = ({wallet, connectedAddress, onConnect}: Props) => {
           </div>
           <div className="mt-0">
             <OldFrame>
-              <FrameMessage>
-                <WalletButton
-                wallet={wallet}
-                connectedAddress={connectedAddress}
-                availableAddress={availableAddress}
-                onConnect={onConnect}
-                />
-                {!connectedAddress && availableAddress && (
-                <>
-                <p className="mt-2 text-gray-600 text-sm">
-                  Since you have connected to Chainlock before, Metamask will automatically connect to address <Address>{availableAddress}</Address> when you click the button above.
-                </p>
-                <p className="mt-2 text-gray-600 text-sm">To use a different address, open Metamask and select the address you want to use.
-                  In the top-left corner of the Metamask window, you'll see "connected" if you have used this address in Chainlock before,
-                  or "disconnected" if you haven't used this address in Chainlock yet. Use these buttons to connect new addresses and/or
-                  revoke permissions on previous addresses.
-                </p>
-                </>
-                )}
-              </FrameMessage>
+              <WalletButton
+              wallet={wallet}
+              connectedAddress={connectedAddress}
+              availableAddress={availableAddress}
+              onConnect={onConnect}
+              />
+              {!connectedAddress && availableAddress && (
+              <>
+              <p className="mt-2 text-gray-600 text-sm">
+                Since you have connected to Chainlock before, Metamask will automatically connect to address <Address>{availableAddress}</Address> when you click the button above.
+              </p>
+              <p className="mt-2 text-gray-600 text-sm">To use a different address, open Metamask and select the address you want to use.
+                In the top-left corner of the Metamask window, you'll see "connected" if you have used this address in Chainlock before,
+                or "disconnected" if you haven't used this address in Chainlock yet. Use these buttons to connect new addresses and/or
+                revoke permissions on previous addresses.
+              </p>
+              </>
+              )}
             </OldFrame>
           </div>
         </div>

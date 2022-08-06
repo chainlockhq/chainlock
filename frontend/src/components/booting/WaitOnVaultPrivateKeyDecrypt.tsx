@@ -1,7 +1,6 @@
 import Address from "../_shared/atoms/Address"
 import Button from "../_shared/atoms/Button"
 import OldFrame from "../_shared/atoms/OldFrame"
-import FrameMessage from "../_shared/atoms/FrameMessage"
 
 interface Props {
   /**
@@ -22,7 +21,7 @@ const WaitOnVaultPrivateKeyDecrypt = ({onBack, vaultAddress}: Props) => {
       </div>
       <div className="">
       <OldFrame>
-      <FrameMessage>
+      <div>
         <div className="mb-20 text-small p-10 bg-white rounded-xl drop-shadow-lg">
           <div className="mb-6">
             <p className="">Metamask associated:</p>
@@ -74,7 +73,7 @@ const WaitOnVaultPrivateKeyDecrypt = ({onBack, vaultAddress}: Props) => {
           </div>
         {onBack && (<p className="mt-2"><Button onClick={() =>onBack()}>back</Button></p>)}
       </div>
-      </FrameMessage>
+      </div>
     </OldFrame>
     </div>
     <div>

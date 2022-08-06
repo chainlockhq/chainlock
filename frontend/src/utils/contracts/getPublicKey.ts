@@ -12,7 +12,7 @@ const getPublicKey = async (wallet: Wallet, vaultAddress: string, memberAddress:
 
   // TODO handle situation where eth node is not available
 
-  const vaultContract = getVaultContract(vaultAddress);
+  const vaultContract = await getVaultContract(wallet, vaultAddress);
 
   // TODO
   vaultContract.getPublicKey(vaultAddress)

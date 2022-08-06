@@ -1,17 +1,15 @@
-// TODO import from smartcontracts/artifacts folder?
-import VaultFactory from "../../smartcontracts/VaultFactory.json"
-import { Contract, ethers } from "ethers";
+import Wallet from "../../objects/Wallet.interface";
+import { VaultFactory, VaultFactory__factory } from "../../typechain";
 import isAddress from "../isAddress";
 
-// TODO use typechain type?
-const getVaultFactoryContract = (): Contract => {
+const getVaultFactoryContract = async (wallet: Wallet): Promise<VaultFactory> => {
   const address = process.env.REACT_APP_VAULT_FACTORY_CONTRACT_ADDRESS || ''
   if (!isAddress(address)) {
     throw new Error(`${address} is not a valid contract address`)
   }
 
   // NOTE: signer not (yet) connected
-  return new ethers.Contract(address, VaultFactory.abi)
+  return VaultFactory__factory.connect(address, await wallet.getProvider())
 }
 
 export default getVaultFactoryContract;

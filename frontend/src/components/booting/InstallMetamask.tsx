@@ -1,7 +1,7 @@
-import Frame from "../atoms/Frame"
-import FrameLogo from "../atoms/FrameLogo"
-import FrameMessage from "../atoms/FrameMessage"
-import Link from "../atoms/Link"
+import Frame from "../_shared/atoms/Frame"
+import FrameLogo from "../_shared/atoms/FrameLogo"
+import FrameMessage from "../_shared/atoms/FrameMessage"
+import Link from "../_shared/atoms/Link"
 
 const InstallMetamask = () => {
   return (

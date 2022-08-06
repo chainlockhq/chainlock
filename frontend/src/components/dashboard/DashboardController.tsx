@@ -1,5 +1,5 @@
-import Wallet from "../objects/Wallet.interface"
-import Header from "./molecules/Header"
+import Wallet from "../../objects/Wallet.interface"
+import Header from "../_shared/molecules/Header"
 
 interface Props {
   wallet: Wallet
@@ -10,7 +10,7 @@ interface Props {
   disconnectWallet: () => void
 }
 
-const Dashboard = ({
+const DashboardController = ({
   wallet, address, vaultAddress, vaultKeyPair, goToVaultSelect, disconnectWallet
 }: Props) => {
   return (
@@ -28,4 +28,4 @@ const Dashboard = ({
   )
 }
 
-export default Dashboard
+export default DashboardController

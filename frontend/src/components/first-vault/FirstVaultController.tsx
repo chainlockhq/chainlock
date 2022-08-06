@@ -1,7 +1,7 @@
 import { ENGINE_METHOD_CIPHERS } from "constants"
-import Frame from "../atoms/Frame"
-import FrameLogo from "../atoms/FrameLogo"
-import FrameMessage from "../atoms/FrameMessage"
+import Frame from "../_shared/atoms/Frame"
+import FrameLogo from "../_shared/atoms/FrameLogo"
+import FrameMessage from "../_shared/atoms/FrameMessage"
 import Wallet from "../../objects/Wallet.interface"
 import { ethers } from "ethers"
 import { useState, useEffect } from "react"
@@ -14,7 +14,7 @@ interface Props {
   connectedAddress: string
 }
 
-const FirstVault = ({ wallet, connectedAddress }: Props) => {
+const FirstVaultController = ({ wallet, connectedAddress }: Props) => {
   const [currentAccount, setCurrentAccount] = useState("")
   const [correctNetwork, setCorrectNetwork] = useState(false)
   const [deployingStatus, setDeployingStatus] = useState(0)
@@ -148,4 +148,4 @@ const FirstVault = ({ wallet, connectedAddress }: Props) => {
   )
 }
 
-export default FirstVault
+export default FirstVaultController

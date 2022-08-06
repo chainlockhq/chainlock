@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import Controller from './components/Controller';
+import BootingController from './components/booting/BootingController';
 import Research from '../src/research/Research'
 
 
@@ -12,7 +12,7 @@ function App() {
         <p className='text-gray-500'>If you want to try out chainlock, create a new address in metamask and only use it on this website.</p>
       </div>
       <div className='grow'>
-        <Controller />
+        <BootingController />
       </div>
     </div>
   );

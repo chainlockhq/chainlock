@@ -1,7 +1,7 @@
-import getDeterministicAddressName from "../../utils/getDeterministicAddressName"
-import isAddress from "../../utils/isAddress"
-import substringAfter from "../../utils/substring-after"
-import getAddressUrl from "../../utils/urls/get-address-url"
+import getDeterministicAddressName from "../../../utils/getDeterministicAddressName"
+import isAddress from "../../../utils/isAddress"
+import substringAfter from "../../../utils/substring-after"
+import getAddressUrl from "../../../utils/urls/get-address-url"
 
 interface Props {
   children: string

@@ -1,13 +1,14 @@
 import useAddress from "../../hooks/useAddress"
 import Wallet from "../../objects/Wallet.interface"
-import Address from "../atoms/Address"
-import Frame from "../atoms/Frame"
-import FrameLogo from "../atoms/FrameLogo"
-import FrameMessage from "../atoms/FrameMessage"
-import WalletButton from "../molecules/WalletButton"
+import Address from "../_shared/atoms/Address"
+import Frame from "../_shared/atoms/Frame"
+import FrameLogo from "../_shared/atoms/FrameLogo"
+import FrameMessage from "../_shared/atoms/FrameMessage"
+import WalletButton from "../_shared/molecules/WalletButton"
 import vaultImage from "../../images/vault.png"
 
 interface Props {
+
   wallet: Wallet
   connectedAddress?: string
   onConnect?: () => void

@@ -1,17 +1,17 @@
 import { useCallback } from "react"
-import useAddress from "../hooks/useAddress"
-import useCurrentVaultAddress from "../hooks/useCurrentVaultAddress"
-import useVaultAddresses from "../hooks/useVaultAddresses"
-import useVaultKeyPair from "../hooks/useVaultKeyPair"
-import useWallet from "../hooks/useWallet"
-import Dashboard from "./Dashboard"
-import ConnectMetamask from "./pages/ConnectMetamask"
-import FirstVault from "./pages/FirstVault"
-import InstallMetamask from "./pages/InstallMetamask"
-import SelectVault from "./pages/SelectVault"
-import WaitOnVaultPrivateKeyDecrypt from "./pages/WaitOnVaultPrivateKeyDecrypt"
+import useAddress from "../../hooks/useAddress"
+import useCurrentVaultAddress from "../../hooks/useCurrentVaultAddress"
+import useVaultAddresses from "../../hooks/useVaultAddresses"
+import useVaultKeyPair from "../../hooks/useVaultKeyPair"
+import useWallet from "../../hooks/useWallet"
+import DashboardController from "../dashboard/DashboardController"
+import ConnectMetamask from "./ConnectMetamask"
+import FirstVaultController from "../first-vault/FirstVaultController"
+import InstallMetamask from "./InstallMetamask"
+import SelectVault from "./SelectVault"
+import WaitOnVaultPrivateKeyDecrypt from "./WaitOnVaultPrivateKeyDecrypt"
 
-const Controller = () => {
+const BootingController = () => {
   const wallet = useWallet()
   const [ address, setAddress ] = useAddress(wallet)
   const connectWallet = useCallback((newAddress: string) => setAddress(newAddress), [setAddress])
@@ -39,7 +39,7 @@ const Controller = () => {
 
   if (vaultAddresses.length <= 0) {
     return (
-      <FirstVault
+      <FirstVaultController
         wallet={wallet}
         connectedAddress={address}
       />
@@ -65,7 +65,7 @@ const Controller = () => {
   }
 
   return (
-    <Dashboard
+    <DashboardController
       wallet={wallet}
       address={address}
       vaultAddress={currentVaultAddress}
@@ -76,4 +76,4 @@ const Controller = () => {
   )
 }
 
-export default Controller
+export default BootingController

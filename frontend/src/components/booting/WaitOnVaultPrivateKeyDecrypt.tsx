@@ -1,8 +1,8 @@
-import Address from "../atoms/Address"
-import Button from "../atoms/Button"
-import Frame from "../atoms/Frame"
-import FrameLogo from "../atoms/FrameLogo"
-import FrameMessage from "../atoms/FrameMessage"
+import Address from "../_shared/atoms/Address"
+import Button from "../_shared/atoms/Button"
+import Frame from "../_shared/atoms/Frame"
+import FrameLogo from "../_shared/atoms/FrameLogo"
+import FrameMessage from "../_shared/atoms/FrameMessage"
 
 interface Props {
   /**

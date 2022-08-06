@@ -1,10 +1,11 @@
-import OldFrame from "../_shared/atoms/OldFrame"
+import { useState } from "react"
 import Wallet from "../../objects/Wallet.interface"
-import { ethers } from "ethers"
-import { useState, useEffect } from "react"
-import VaultFactory from "../../smartcontracts/VaultFactory.json"
+import getVaultFactoryContract from "../../utils/contracts/getVaultFactoryContract"
+import lock from "../../utils/hooks/lock"
 import getTransactionUrl from "../../utils/urls/get-transaction-url"
-import getAddressUrl from "../../utils/urls/get-address-url"
+import FirstVaultCreated from "./FirstVaultCreated"
+import FirstVaultInProgress from "./FirstVaultInProgress"
+import FirstVaultLanding from "./FirstVaultLanding"
 
 interface Props {
   wallet: Wallet
@@ -12,131 +13,49 @@ interface Props {
 }
 
 const FirstVaultController = ({ wallet, connectedAddress }: Props) => {
-  const [currentAccount, setCurrentAccount] = useState("")
-  const [correctNetwork, setCorrectNetwork] = useState(false)
-  const [deployingStatus, setDeployingStatus] = useState(0)
-  const [txHash, setTxHash] = useState("")
-  const [vaultAddress, setVaultAddress] = useState<string>()
+  const [creationInProgress, setCreationInProgress] = useState(false)
+  const [createdVaultAddress, setCreatedVaultAddress] = useState<string>()
 
-  const expectedChainId = process.env.REACT_APP_CHAIN_ID
-  const vaultFactoryContractAddress = process.env.REACT_APP_VAULT_FACTORY_CONTRACT_ADDRESS
+  const createVault = () => {
+    lock(setCreationInProgress, async () => {
+      console.debug('creating new vault...')
 
-  // Checks if wallet is connected
-  const checkIfWalletIsConnected = async () => {
-    const { ethereum } = window
-    if (ethereum) {
-      console.log("Got the ethereum object: ", ethereum)
-    } else {
-      console.log("No Wallet found. Connect Wallet")
-    }
+      const provider = await wallet.getProvider()
+      const network = await provider.getNetwork()
+      console.debug('chain id:', network.chainId)
+      // TODO compare with process.env.REACT_APP_CHAIN_ID
+      // TODO ask to switch chains? https://soliditytips.com/articles/detect-switch-chain-metamask/
 
-    const accounts = await ethereum.request({ method: "eth_accounts" })
+      const signer = provider.getSigner()
+      const vaultFactoryContract = getVaultFactoryContract()
 
-    if (accounts.length !== 0) {
-      console.log("Found authorized Account: ", accounts[0])
-      setCurrentAccount(accounts[0])
-    } else {
-      console.log("No authorized account found")
-    }
+      const tx = await vaultFactoryContract.connect(signer).createVault()
+      console.debug(`contract creation transaction hash:`, tx.hash)
+
+      const receipt = await tx.wait()
+      console.debug('transaction status:', receipt.status)
+
+      // TODO below may fail => wrong contract / contract not deployed?
+      const [vaultAddress] = receipt.events[0].args
+
+      console.debug(`vault created!`)
+      console.debug(`address:`, vaultAddress)
+      console.debug(`view transaction:`, getTransactionUrl(tx.hash))
+
+      setCreatedVaultAddress(vaultAddress)
+    })
   }
 
-  // Checks if wallet is connected to the correct network
-  const checkCorrectNetwork = async () => {
-    const { ethereum } = window
-    let chainId = await ethereum.request({ method: "eth_chainId" })
-    console.log("Connected to chain:" + chainId)
-
-    if (expectedChainId !== chainId) {
-      setCorrectNetwork(false)
-    } else {
-      setCorrectNetwork(true)
-    }
+  if (creationInProgress) {
+    return <FirstVaultInProgress/>
   }
 
-  useEffect(() => {
-    checkIfWalletIsConnected()
-    checkCorrectNetwork()
-  }, [])
-
-  async function createVault() {
-    try {
-      const { ethereum } = window
-
-      if (ethereum) {
-        const provider = new ethers.providers.Web3Provider(ethereum)
-        const signer = provider.getSigner()
-        const factoryVaultContract = new ethers.Contract(vaultFactoryContractAddress!, VaultFactory.abi, signer)
-
-        let newVaultTx = await factoryVaultContract.createVault()
-        setTxHash(newVaultTx.hash)
-        console.log("Creating New Vault....", newVaultTx.hash)
-        setDeployingStatus(1)
-        let receipt = await newVaultTx.wait()
-        const event = receipt.events[0]
-        const [creator, vaultAddress] = event.args
-        setVaultAddress(vaultAddress)
-        setDeployingStatus(2)
-        console.log("New Vault created!", receipt)
-        console.log(`See transaction: ${getTransactionUrl(newVaultTx.hash)}`)
-      } else {
-        console.log("Ethereum object doesn't exist!")
-      }
-    } catch (error) {
-      console.log("Error creating New Vault", error)
-    }
+  if (!createdVaultAddress) {
+    return <FirstVaultLanding onClick={createVault}/>
   }
 
-  if (deployingStatus === 1) {
-    return (
-      <div className="bg-[#2b3f4a] h-screen grid grid-flex grid-cols-3 gap-6">
-        <div></div>
-        <div className="text-white text-center">
-          <OldFrame>
-              <p>Creating the New Vault. Waiting for confirmation....</p>
-          </OldFrame>
-        </div>
-        <div></div>
-      </div>
-    )
-  }
-  if (deployingStatus === 2) {
-    const txUrl = getTransactionUrl(txHash)
-    const vaultAddressUrl = getAddressUrl(vaultAddress!)
-    return (
-      <div className="bg-[#2b3f4a] h-screen grid grid-flex grid-cols-3 gap-6">
-        <div></div>
-        <div className="text-white text-center">
-          <OldFrame>
-            <p>New Vault created!</p>
-            <p>
-              See transaction:
-              <a href={txUrl}>{txUrl}</a>
-            </p>
-            <p>
-              New Vault Address:
-              <a href={vaultAddressUrl}>{vaultAddressUrl}</a>
-            </p>
-          </OldFrame>
-        </div>
-        <div></div>
-      </div>
-    )
-  }
-  return (
-    <div className="bg-[#2b3f4a] h-screen grid grid-flex grid-cols-3 gap-6">
-      <div></div>
-      <div className="text-white text-center">
-        <OldFrame>
-          <p className="text-5xl font-bold mb-6">Welcome</p>
-          <p>Create your first vault</p>
-          <button onClick={createVault} className="mt-14 bg-[#e8cd8e] text-[#333] py-3 px-10 rounded-xl">
-            Create vault
-          </button>
-        </OldFrame>
-      </div>
-      <div></div>
-    </div>
-  )
+  return <FirstVaultCreated vaultAddress={createdVaultAddress}/>
+
 }
 
 export default FirstVaultController

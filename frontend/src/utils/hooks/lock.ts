@@ -5,9 +5,9 @@
 const lock = (
   setLock: (lock: boolean) => void,
   cb: () => Promise<void>
-) => {
+): Promise<void> => {
   setLock(true)
-  cb().finally(() => setLock(false))
+  return cb().finally(() => setLock(false))
 }
 
 export default lock

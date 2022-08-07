@@ -1,6 +1,6 @@
 import Frame from "../_shared/atoms/Frame"
 
-const FirstVaultCreationInProgress = () => {
+const CreateVaultInProgress = () => {
   return (
     <div className="bg-[#2b3f4a] h-full text-white text-center">
       <Frame>
@@ -10,4 +10,4 @@ const FirstVaultCreationInProgress = () => {
   )
 }
 
-export default FirstVaultCreationInProgress
+export default CreateVaultInProgress

@@ -2,13 +2,13 @@ import { useState } from "react"
 import Wallet from "../../objects/Wallet.interface"
 import createVault from "../../utils/contracts/createVault"
 import joinVault from "../../utils/contracts/joinVault"
-import FirstVaultCreated from "./FirstVaultCreated"
-import FirstVaultCreationError from "./FirstVaultCreationError"
-import FirstVaultCreationInProgress from "./FirstVaultCreationInProgress"
-import FirstVaultJoined from "./FirstVaultJoined"
-import FirstVaultJoiningError from "./FirstVaultJoiningError"
-import FirstVaultJoiningInProgress from "./FirstVaultJoiningInProgress"
-import FirstVaultLanding from "./FirstVaultLanding"
+import CreateVaultSuccess from "./CreateVaultSuccess"
+import CreateVaultError from "./CreateVaultError"
+import CreateVaultInProgress from "./CreateVaultInProgress"
+import JoinVaultLanding from "./JoinVaultLanding"
+import JoinVaultError from "./JoinVaultError"
+import JoinVaultInProgress from "./JoinVaultInProgress"
+import CreateVaultLanding from "./CreateVaultLanding"
 
 type Step = 'landing' | 'vault-creation-in-progress' | 'vault-creation-failed' | 'vault-creation-succeeded' |
             'vault-joining-in-progress' | 'vault-joining-failed' | 'vault-joining-succeeded'
@@ -19,7 +19,7 @@ interface Props {
   onVaultCreated?: (vaultAddress: string) => void
 }
 
-const FirstVaultController = ({ wallet, connectedAddress, onVaultCreated }: Props) => {
+const CreateVaultController = ({ wallet, connectedAddress, onVaultCreated }: Props) => {
   const [step, setStep] = useState<Step>('landing')
   const [createdVaultAddress, setCreatedVaultAddress] = useState<string>()
 
@@ -63,22 +63,22 @@ const FirstVaultController = ({ wallet, connectedAddress, onVaultCreated }: Prop
 
   switch(step) {
     case 'landing':
-      return <FirstVaultLanding onClick={onCreateVault}/>
+      return <CreateVaultLanding onClick={onCreateVault}/>
     case 'vault-creation-in-progress':
-      return <FirstVaultCreationInProgress/>
+      return <CreateVaultInProgress/>
     case 'vault-creation-failed':
-      return <FirstVaultCreationError onReset={resetToCreation}/>
+      return <CreateVaultError onReset={resetToCreation}/>
     case 'vault-creation-succeeded':
-      return <FirstVaultCreated vaultAddress={createdVaultAddress!} onJoinVault={onJoinVault}/>
+      return <CreateVaultSuccess vaultAddress={createdVaultAddress!} onJoinVault={onJoinVault}/>
     case 'vault-joining-in-progress':
-      return <FirstVaultJoiningInProgress/>
+      return <JoinVaultInProgress/>
     case 'vault-joining-failed':
-      return <FirstVaultJoiningError onReset={resetToJoining}/>
+      return <JoinVaultError onReset={resetToJoining}/>
     case 'vault-joining-succeeded':
-      return <FirstVaultJoined onContinue={onContinue}/>
+      return <JoinVaultLanding onContinue={onContinue}/>
     default:
       throw new Error(`step '${step}' is not supported`)
   }
 }
 
-export default FirstVaultController
+export default CreateVaultController

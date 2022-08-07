@@ -1,4 +1,4 @@
-import { useCallback } from "react"
+import { useCallback, useState } from "react"
 import useAddress from "../../hooks/useAddress"
 import useCurrentVaultAddress from "../../hooks/useCurrentVaultAddress"
 import useVaultAddresses from "../../hooks/useVaultAddresses"
@@ -6,7 +6,7 @@ import useVaultKeyPair from "../../hooks/useVaultKeyPair"
 import useWallet from "../../hooks/useWallet"
 import DashboardController from "../dashboard/DashboardController"
 import ConnectMetamask from "./ConnectMetamask"
-import FirstVaultController from "../first-vault/FirstVaultController"
+import CreateVaultController from "../create-vault/CreateVaultController"
 import InstallMetamask from "./InstallMetamask"
 import SelectVault from "./SelectVault"
 import WaitOnVaultPrivateKeyDecrypt from "./WaitOnVaultPrivateKeyDecrypt"
@@ -17,6 +17,7 @@ const BootingController = () => {
   const connectWallet = useCallback((newAddress: string) => setAddress(newAddress), [setAddress])
   const disconnectWallet = useCallback(() => setAddress(undefined), [setAddress])
   const [vaultAddresses, setVaultAddresses] = useVaultAddresses(wallet, address)
+  const [shouldCreateVault, setShouldCreateVault] = useState(false)
   const [currentVaultAddress, setCurrentVaultAddress] = useCurrentVaultAddress(address, vaultAddresses)
   const goToVaultSelect = useCallback(() => setCurrentVaultAddress(undefined), [setCurrentVaultAddress])
   const { vaultKeyPair } = useVaultKeyPair(wallet, address, currentVaultAddress, { onDialogCancel: goToVaultSelect })
@@ -35,12 +36,15 @@ const BootingController = () => {
     )
   }
 
-  if (vaultAddresses.length <= 0) {
+  if (vaultAddresses.length <= 0 || shouldCreateVault) {
     return (
-      <FirstVaultController
+      <CreateVaultController
         wallet={wallet}
         connectedAddress={address}
-        onVaultCreated={(newVaultAddress) => setVaultAddresses([...vaultAddresses, newVaultAddress])}
+        onVaultCreated={(newVaultAddress) => {
+          setVaultAddresses([...vaultAddresses, newVaultAddress])
+          setShouldCreateVault(false)
+        }}
       />
     )
   }
@@ -51,6 +55,7 @@ const BootingController = () => {
         address={address}
         vaultAddresses={vaultAddresses}
         onSelect={(va) => setCurrentVaultAddress(va)}
+        onCreateVault={() => setShouldCreateVault(true)}
       />
     )
   }

@@ -5,7 +5,7 @@ interface Props {
   onReset: () => void
 }
 
-const FirstVaultCreationError = ({ onReset }: Props) => {
+const CreateVaultError = ({ onReset }: Props) => {
   return (
     <div className="bg-[#2b3f4a] h-full text-white text-center">
       <Frame>
@@ -16,4 +16,4 @@ const FirstVaultCreationError = ({ onReset }: Props) => {
   )
 }
 
-export default FirstVaultCreationError
+export default CreateVaultError

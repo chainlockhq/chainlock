@@ -1,15 +1,17 @@
 import Address from "../_shared/atoms/Address"
+import Button from "../_shared/atoms/Button"
 import Frame from "../_shared/atoms/Frame"
 
 interface Props {
   address: string
   vaultAddresses: string[]
   onSelect?: (vaultAddress: string) => void
+  onCreateVault?: () => void
 }
 
 const CHOOSE_A_VAULT = 'Select vault'
 
-const SelectVault = ({address, vaultAddresses, onSelect}: Props) => {
+const SelectVault = ({address, vaultAddresses, onSelect, onCreateVault}: Props) => {
   const onChange: React.ChangeEventHandler<HTMLSelectElement> = (e) => {
     if (onSelect) {
       onSelect(e.target.value)
@@ -36,6 +38,26 @@ const SelectVault = ({address, vaultAddresses, onSelect}: Props) => {
             </option>
           ))}
         </select>
+        <div>
+          <div>
+            <div className="
+              inline-flex
+              w-2/5
+              items-center
+              before:content-['']
+              before:border-b-2
+              before:border-b-slate-600
+              before:w-full
+              before:mr-2
+              after:content-['']
+              after:border-b-2
+              after:border-b-slate-600
+              after:w-full
+              after:ml-2
+            ">or</div>
+          </div>
+          <Button onClick={onCreateVault}>create new vault</Button>
+        </div>
         <div>
           <span className="text-slate-300">you are</span> <Address named>{address}</Address>
         </div>

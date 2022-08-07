@@ -6,7 +6,7 @@ import useVaultKeyPair from "../../hooks/useVaultKeyPair"
 import useWallet from "../../hooks/useWallet"
 import DashboardController from "../dashboard/DashboardController"
 import ConnectMetamask from "./ConnectMetamask"
-import FirstVaultController from "../first-vault/FirstVaultController"
+import CreateVaultController from "../create-vault/CreateVaultController"
 import InstallMetamask from "./InstallMetamask"
 import SelectVault from "./SelectVault"
 import WaitOnVaultPrivateKeyDecrypt from "./WaitOnVaultPrivateKeyDecrypt"
@@ -37,7 +37,7 @@ const BootingController = () => {
 
   if (vaultAddresses.length <= 0) {
     return (
-      <FirstVaultController
+      <CreateVaultController
         wallet={wallet}
         connectedAddress={address}
         onVaultCreated={(newVaultAddress) => setVaultAddresses([...vaultAddresses, newVaultAddress])}

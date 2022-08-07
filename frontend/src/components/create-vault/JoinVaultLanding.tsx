@@ -5,7 +5,7 @@ interface Props {
   onContinue: () => void,
 }
 
-const FirstVaultJoined = ({ onContinue }: Props) => {
+const JoinVaultLanding = ({ onContinue }: Props) => {
   return (
     <div className="bg-[#2b3f4a] h-full text-white text-center">
       <Frame>
@@ -16,4 +16,4 @@ const FirstVaultJoined = ({ onContinue }: Props) => {
   )
 }
 
-export default FirstVaultJoined
+export default JoinVaultLanding

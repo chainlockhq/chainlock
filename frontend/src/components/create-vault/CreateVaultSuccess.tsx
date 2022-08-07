@@ -7,7 +7,7 @@ interface Props {
   onJoinVault: (vaultAddress: string) => void,
 }
 
-const FirstVaultCreated = ({ vaultAddress, onJoinVault }: Props) => {
+const CreateVaultSuccess = ({ vaultAddress, onJoinVault }: Props) => {
   return (
     <div className="bg-[#2b3f4a] h-full text-white text-center">
       <Frame>
@@ -24,4 +24,4 @@ const FirstVaultCreated = ({ vaultAddress, onJoinVault }: Props) => {
   )
 }
 
-export default FirstVaultCreated
+export default CreateVaultSuccess

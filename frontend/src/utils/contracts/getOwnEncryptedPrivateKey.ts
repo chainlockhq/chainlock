@@ -14,7 +14,9 @@ const getOwnEncryptedPrivateKey = async (wallet: Wallet, vaultAddress: string, m
 
   const vaultContract = await getVaultContract(wallet, vaultAddress);
 
-  const encryptedPrivateKeyStr = await vaultContract.getOwnEncryptedPrivateKey()
+  const signer = provider.getSigner();
+
+  const encryptedPrivateKeyStr = await vaultContract.connect(signer).getOwnEncryptedPrivateKey()
   if (isBlank(encryptedPrivateKeyStr)) {
     throw new Error(`public key for address ${memberAddress} in vault ${vaultAddress} is blank`)
   }

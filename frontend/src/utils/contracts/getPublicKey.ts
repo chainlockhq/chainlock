@@ -13,7 +13,9 @@ const getPublicKey = async (wallet: Wallet, vaultAddress: string, memberAddress:
 
   const vaultContract = await getVaultContract(wallet, vaultAddress)
 
-  const publicKey = await vaultContract.getPublicKey(memberAddress)
+  const signer = provider.getSigner();
+
+  const publicKey = await vaultContract.connect(signer).getPublicKey(memberAddress)
   if (isBlank(publicKey)) {
     throw new Error(`public key for address ${memberAddress} in ${vaultAddress} is blank`)
   }

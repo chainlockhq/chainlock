@@ -10,9 +10,12 @@ import CreateVaultController from "../create-vault/CreateVaultController"
 import InstallMetamask from "./InstallMetamask"
 import SelectVault from "./SelectVault"
 import WaitOnVaultPrivateKeyDecrypt from "./WaitOnVaultPrivateKeyDecrypt"
+import WrongChain from "./WrongChain"
+import useChainId from "../../hooks/useChainId"
 
 const BootingController = () => {
   const wallet = useWallet()
+  const chainId = useChainId(wallet)
   const [address, setAddress] = useAddress(wallet)
   const connectWallet = useCallback((newAddress: string) => setAddress(newAddress), [setAddress])
   const disconnectWallet = useCallback(() => setAddress(undefined), [setAddress])
@@ -24,6 +27,16 @@ const BootingController = () => {
 
   if (!wallet) {
     return <InstallMetamask />
+  }
+
+  const expectedChainId = Number(process.env.REACT_APP_CHAIN_ID)
+  if (chainId !== expectedChainId) {
+    return (
+      <WrongChain
+        currentChainId={chainId}
+        expectedChainId={expectedChainId}
+      />
+    )
   }
 
   if (!address) {

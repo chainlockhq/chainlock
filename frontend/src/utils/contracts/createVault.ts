@@ -6,7 +6,7 @@ import getVaultFactoryContract from "./getVaultFactoryContract"
 const createVault = async (wallet: Wallet): Promise<string> => {
   console.debug('creating new vault...')
 
-  const provider = await wallet.getProvider()
+  const provider = wallet.getProvider()
   const network = await provider.getNetwork()
   console.debug('chain id:', network.chainId)
   // TODO compare with process.env.REACT_APP_CHAIN_ID

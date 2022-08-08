@@ -31,6 +31,26 @@ export default interface Wallet {
   removeAddressChangeListener(callback: (newAddress: string | undefined) => void): void
 
   /**
+   * Get the chain id that's currently in use.
+   */
+  getChainId(): Promise<number>
+
+  /**
+   * Register a function that will be called every time the current chain changes.
+   * Do not forget to unregister the function with {@link removeChainChangeListener}
+   * when it's no longer needed.
+   * @param callback the function.
+   */
+   onChainChange(callback: (newChainId: number) => void): void
+
+  /**
+   * Unregister a function that is being called every time the current chain changes.
+   * The function should've been registered first with {@link onChainChange}.
+   * @param callback the function.
+   */
+  removeChainChangeListener(callback: (newChainId: number) => void): void
+
+  /**
    * Get from this wallet the public key of a given address (that can be used for encryption).
    * @param address the address for which the public key should be retrieved.
    */
@@ -55,6 +75,6 @@ export default interface Wallet {
   /**
    * Get the ethers.js provider.
    */
-  getProvider(): Promise<ethers.providers.JsonRpcProvider>;
+  getProvider(): ethers.providers.JsonRpcProvider;
   
 }

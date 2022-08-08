@@ -7,7 +7,8 @@ import Wallet from "./Wallet.interface";
 export default class MetamaskWallet implements Wallet {
 
   constructor(
-    private mm: RawMetamask
+    private mm: RawMetamask,
+    private provider: ethers.providers.Web3Provider = new ethers.providers.Web3Provider(mm)
   ) {}
 
   /**
@@ -67,6 +68,52 @@ export default class MetamaskWallet implements Wallet {
   }
 
   /**
+   * Map the inner callbacks of {@link onChainChange} and {@link removeChainChangeListener}
+   * to the outer callbacks that are passed to metamask,
+   * so we can safely unregister "chainChanged" event listeners.
+   */
+  private onChainChangedRefs = new Ref<
+    (chainId: number) => void,
+    (chainIdHex: string) => void
+  >();
+
+  /**
+   * Get the chain id that's currently in use.
+   */
+  async getChainId(): Promise<number> {
+    return Number(await this.mm.request({ method: 'eth_chainId' }))
+  }
+
+  /**
+   * Register a function that will be called every time the current chain changes.
+   * Do not forget to unregister the function with {@link removeChainChangeListener}
+   * when it's no longer needed.
+   * @param innerCallback the function.
+   */
+  onChainChange(innerCallback: (newChainId: number) => void): void {
+    const outerCallback = (chainIdHex: string) => {
+      innerCallback(Number(chainIdHex));
+    }
+
+    this.onChainChangedRefs.add(innerCallback, outerCallback);
+
+    this.mm.on('chainChanged', outerCallback)
+  }
+
+  /**
+   * Unregister a function that is being called every time the current chain changes.
+   * The function should've been registered first with {@link onChainChange}.
+   * @param innerCallback the function.
+   */
+  removeChainChangeListener(innerCallback: (newChainId: number) => void): void {
+    const outerCallback = this.onChainChangedRefs.getAndRemove(innerCallback);
+
+    if (outerCallback !== undefined) {
+      this.mm.removeListener('chainChanged', outerCallback)
+    }
+  }
+
+  /**
    * Get from this wallet the public key of a given address (that can be used for encryption).
    * @param address the address for which the public key should be retrieved.
    */
@@ -119,8 +166,8 @@ export default class MetamaskWallet implements Wallet {
   /**
    * Get the ethers.js provider.
    */
-  async getProvider(): Promise<ethers.providers.JsonRpcProvider> {
-    return new ethers.providers.Web3Provider(this.mm);
+  getProvider(): ethers.providers.JsonRpcProvider {
+    return this.provider
   };
 
   getMetamaskObj(): RawMetamask {

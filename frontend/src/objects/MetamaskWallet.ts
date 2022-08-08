@@ -7,7 +7,8 @@ import Wallet from "./Wallet.interface";
 export default class MetamaskWallet implements Wallet {
 
   constructor(
-    private mm: RawMetamask
+    private mm: RawMetamask,
+    private provider: ethers.providers.Web3Provider = new ethers.providers.Web3Provider(mm)
   ) {}
 
   /**
@@ -120,7 +121,7 @@ export default class MetamaskWallet implements Wallet {
    * Get the ethers.js provider.
    */
   getProvider(): ethers.providers.JsonRpcProvider {
-    return new ethers.providers.Web3Provider(this.mm);
+    return this.provider
   };
 
   getMetamaskObj(): RawMetamask {

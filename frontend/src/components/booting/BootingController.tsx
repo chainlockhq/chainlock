@@ -63,6 +63,7 @@ const BootingController = () => {
   if (!vaultKeyPair) {
     return (
       <WaitOnVaultPrivateKeyDecrypt
+        memberAddress={address}
         vaultAddress={currentVaultAddress}
         onBack={goToVaultSelect}
       />

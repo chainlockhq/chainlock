@@ -4,6 +4,10 @@ import Frame from "../_shared/atoms/Frame"
 
 interface Props {
   /**
+   * The account that's currently active.
+   */
+  memberAddress: string
+  /**
    * The address of the vault that is being decrypted.
    */
   vaultAddress: string
@@ -13,14 +17,17 @@ interface Props {
   onBack: () => void,
 }
 
-const WaitOnVaultPrivateKeyDecrypt = ({onBack, vaultAddress}: Props) => {
+const WaitOnVaultPrivateKeyDecrypt = ({onBack, memberAddress, vaultAddress}: Props) => {
   return (
     <div className="bg-[#e8cd8e] h-full">
       <Frame size="xxl">
         <div>
           <div className="mb-20 text-small p-10 bg-white rounded-xl drop-shadow-lg">
             <div className="mb-6">
-              <span className="font-light text-slate-500">You are</span> <Address named>{vaultAddress}</Address>
+              <span className="font-light text-slate-500">You are</span> <Address named>{memberAddress}</Address>
+            </div>
+            <div className="mb-6">
+              <span className="font-light text-slate-500">You are connecting to</span> <Address named>{vaultAddress}</Address>
             </div>
             <p className="mt-2 mb-4">If you cannot see a Metamask dialog, click on the 🦊 icon in your browser.</p>
             <p className="text-small font-light text-slate-500">To go back to vault selection, cancel the decrypt request or click on the button below:</p>

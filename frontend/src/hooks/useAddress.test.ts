@@ -24,7 +24,7 @@ test('when current address = undefined, useAddress hook should return undefined 
   const { result } = renderHook(() => useAddress(wallet));
 
   await waitFor(() => {
-    expect(result.current).toBe('[undefined, [Function bound dispatchSetState]]')
+    expect(result.current).toContain(undefined)
   })
 })
 
@@ -38,7 +38,7 @@ test('when current address = asdf, useAddress hook should return asdf on load', 
   const { result } = renderHook(() => useAddress(wallet));
 
   await waitFor(() => {
-    expect(result.current).toBe('["asdf", [Function bound dispatchSetState]]')
+    expect(result.current).toContain('asdf')
   })
 })
 
@@ -57,14 +57,14 @@ test('useAddress hook should get the current address on change', async () => {
 
   const { result } = renderHook(() => useAddress(wallet));
 
-  await waitFor(() => expect(result.current).toBe('["address-1", [Function bound dispatchSetState]]'))
+  await waitFor(() => expect(result.current).toContain('address-1'))
   expect(registerAddressChangeListenerSpy).toHaveBeenCalledTimes(1)
 
   act(() => {
     addressChangeCallback(['address-2'])
   })
 
-  expect(result.current).toBe('address-2')
+  expect(result.current).toContain('address-2')
   expect(registerAddressChangeListenerSpy).toHaveBeenCalledTimes(1)
 })
 

@@ -37,7 +37,7 @@ const joinWithVaultKeyPair = async (
   console.debug('joining vault with key pair...');
 
   // get provider and then signer from current wallet
-  const provider = await wallet.getProvider();
+  const provider = wallet.getProvider();
   // TODO deal with chain id?
 
   const signer = provider.getSigner()

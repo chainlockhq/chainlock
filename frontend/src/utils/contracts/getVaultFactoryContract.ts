@@ -9,7 +9,7 @@ const getVaultFactoryContract = async (wallet: Wallet): Promise<VaultFactory> =>
   }
 
   // NOTE: signer not (yet) connected
-  return VaultFactory__factory.connect(address, await wallet.getProvider())
+  return VaultFactory__factory.connect(address, wallet.getProvider())
 }
 
 export default getVaultFactoryContract;

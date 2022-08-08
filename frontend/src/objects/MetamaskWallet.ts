@@ -119,7 +119,7 @@ export default class MetamaskWallet implements Wallet {
   /**
    * Get the ethers.js provider.
    */
-  async getProvider(): Promise<ethers.providers.JsonRpcProvider> {
+  getProvider(): ethers.providers.JsonRpcProvider {
     return new ethers.providers.Web3Provider(this.mm);
   };
 

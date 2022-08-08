@@ -8,7 +8,7 @@ const getVaultContract = async (wallet: Wallet, vaultAddress: string): Promise<V
   }
 
   // NOTE: signer not (yet) connected
-  return Vault__factory.connect(vaultAddress, await wallet.getProvider())
+  return Vault__factory.connect(vaultAddress, wallet.getProvider())
 }
 
 export default getVaultContract;

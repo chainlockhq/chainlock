@@ -6,7 +6,7 @@ import getVaultContract from "./getVaultContract";
 const getPublicKey = async (wallet: Wallet, vaultAddress: string, memberAddress: string): Promise<string> => {
   console.debug(`getting public key of address ${memberAddress} from vault ${vaultAddress}...`)
 
-  const provider = await wallet.getProvider();
+  const provider = wallet.getProvider();
   const network = await provider.getNetwork()
   console.debug('chain id:', network.chainId)
   // TODO deal with chain id?

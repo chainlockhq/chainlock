@@ -55,6 +55,6 @@ export default interface Wallet {
   /**
    * Get the ethers.js provider.
    */
-  getProvider(): Promise<ethers.providers.JsonRpcProvider>;
+  getProvider(): ethers.providers.JsonRpcProvider;
   
 }

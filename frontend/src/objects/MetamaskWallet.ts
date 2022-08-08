@@ -8,7 +8,7 @@ export default class MetamaskWallet implements Wallet {
 
   constructor(
     private mm: RawMetamask,
-    private provider: ethers.providers.Web3Provider = new ethers.providers.Web3Provider(mm)
+    private provider: ethers.providers.Web3Provider = new ethers.providers.Web3Provider(mm, Number(process.env.REACT_APP_CHAIN_ID))
   ) {}
 
   /**

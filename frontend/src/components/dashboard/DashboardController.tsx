@@ -27,9 +27,9 @@ const DashboardController = ({
       // TODO: Call to the vault contract and read the secrets for current user
       // and delete this dummy secrets
       const dummySecrets: SecretType[] = []
-      const secret1: SecretType = { identifier: "Twitter", userName: "Larry", encryptedPassword: "*********" }
-      const secret2: SecretType = { identifier: "Instagram", userName: "John12345", encryptedPassword: "*********" }
-      const secret3: SecretType = { identifier: "Whale Wallet", userName: "Vitalik", encryptedPassword: "*********" }
+      const secret1: SecretType = { identifier: "Twitter", username: "Larry", password: "*********" }
+      const secret2: SecretType = { identifier: "Instagram", username: "John12345", password: "*********" }
+      const secret3: SecretType = { identifier: "Whale Wallet", username: "Vitalik", password: "*********" }
       dummySecrets.push(secret1, secret2, secret3)
       setSecrets(dummySecrets)
     }

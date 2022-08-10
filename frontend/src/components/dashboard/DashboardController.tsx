@@ -1,8 +1,11 @@
 import Wallet from "../../objects/Wallet.interface"
 import Header from "../_shared/molecules/Header"
 import DashboardSecrets from "./DashboardSecrets"
-import SecretType from "./SecretType"
+import Secret from "../../objects/Secret.interface"
 import { useEffect, useState } from "react"
+import { BigNumber } from "ethers"
+import getSecretIds from "../../utils/contracts/getSecretIds"
+import getSecret from "../../utils/contracts/getSecret"
 
 interface Props {
   wallet: Wallet
@@ -21,19 +24,32 @@ const DashboardController = ({
   goToVaultSelect,
   disconnectWallet,
 }: Props) => {
-  const [secrets, setSecrets] = useState<SecretType[]>([])
+  const [secretIds, setSecretIds] = useState<BigNumber[]>([])
+  const [secrets, setSecrets] = useState<Secret[]>([])
+
+  // get secret ids on load
   useEffect(() => {
-    if (wallet && address && vaultAddress && vaultKeyPair && secrets.length === 0) {
-      // TODO: Call to the vault contract and read the secrets for current user
-      // and delete this dummy secrets
-      const dummySecrets: SecretType[] = []
-      const secret1: SecretType = { identifier: "Twitter", username: "Larry", password: "*********" }
-      const secret2: SecretType = { identifier: "Instagram", username: "John12345", password: "*********" }
-      const secret3: SecretType = { identifier: "Whale Wallet", username: "Vitalik", password: "*********" }
-      dummySecrets.push(secret1, secret2, secret3)
-      setSecrets(dummySecrets)
-    }
-  }, [wallet, address, vaultAddress, secrets, vaultKeyPair])
+    (async () => {
+      if (wallet && address && vaultAddress && vaultKeyPair && secretIds.length <= 0) {
+        const secretIds = await getSecretIds(wallet, vaultAddress)
+        setSecretIds(secretIds)
+      }
+    })()
+  }, [wallet, address, vaultAddress, vaultKeyPair, secretIds])
+
+  // get secrets when secret ids change
+  useEffect(() => {
+    (async () => {
+      if (wallet && address && vaultAddress && vaultKeyPair && secretIds.length > 0) {
+        const secrets = await Promise.all(secretIds.map(secretId => getSecret(wallet, vaultAddress, secretId)))
+        setSecrets(secrets)
+      }
+    })()
+  }, [wallet, address, vaultAddress, vaultKeyPair, secretIds])
+
+  const addSecretId = (secretId: BigNumber) => {
+    setSecretIds([...secretIds, secretId])
+  }
 
   return (
     <div>
@@ -43,7 +59,13 @@ const DashboardController = ({
         vaultAddress={vaultAddress}
         onChangeVault={goToVaultSelect}
       />
-      <DashboardSecrets walletAddress={address} vaultAddress={vaultAddress} secrets={secrets} />
+      <DashboardSecrets
+        wallet={wallet}
+        vaultAddress={vaultAddress}
+        vaultKeyPair={vaultKeyPair}
+        secrets={secrets}
+        onSecretCreated={addSecretId}
+      />
     </div>
   )
 }

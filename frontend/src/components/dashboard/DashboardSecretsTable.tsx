@@ -1,8 +1,8 @@
 import DashboardSecretsRow from "./DashboardSecretsRow"
-import SecretType from "./SecretType"
+import Secret from "../../objects/Secret.interface"
 
 interface Props {
-  secrets: SecretType[]
+  secrets: Secret[]
 }
 
 const DashboardSecretsTable = ({ secrets }: Props) => {
@@ -18,7 +18,7 @@ const DashboardSecretsTable = ({ secrets }: Props) => {
                     #
                   </th>
                   <th scope="col" className="text-sm font-medium text-white px-6 py-4">
-                    Identifier
+                    Label
                   </th>
                   <th scope="col" className="text-sm font-medium text-white px-6 py-4">
                     UserName
@@ -30,7 +30,7 @@ const DashboardSecretsTable = ({ secrets }: Props) => {
               </thead>
               <tbody>
                 {secrets.map((secret, index) => {
-                  return <DashboardSecretsRow index={index} secret={secret} />
+                  return <DashboardSecretsRow key={index} index={index} secret={secret} />
                 })}
               </tbody>
             </table>

@@ -31,7 +31,10 @@ const DashboardSecrets = ({ wallet, vaultAddress, vaultKeyPair, secrets, onSecre
       <DashboardModal
         onSave={handleSaveSecret}
       />
-      <DashboardSecretsTable secrets={secrets} />
+      <DashboardSecretsTable
+        secrets={secrets}
+        vaultKeyPair={vaultKeyPair}
+      />
     </div>
   )
 }

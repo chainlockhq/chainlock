@@ -3,9 +3,10 @@ import Secret from "../../objects/Secret.interface"
 
 interface Props {
   secrets: Secret[]
+  vaultKeyPair: CryptoKeyPair,
 }
 
-const DashboardSecretsTable = ({ secrets }: Props) => {
+const DashboardSecretsTable = ({ secrets, vaultKeyPair }: Props) => {
   return (
     <div className="flex flex-col">
       <div className="overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -30,7 +31,14 @@ const DashboardSecretsTable = ({ secrets }: Props) => {
               </thead>
               <tbody>
                 {secrets.map((secret, index) => {
-                  return <DashboardSecretsRow key={index} index={index} secret={secret} />
+                  return (
+                    <DashboardSecretsRow
+                      key={index}
+                      index={index}
+                      secret={secret}
+                      vaultKeyPair={vaultKeyPair}
+                    />
+                  )
                 })}
               </tbody>
             </table>

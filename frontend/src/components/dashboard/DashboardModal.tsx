@@ -1,8 +1,34 @@
+import React, { useState } from "react"
+
 interface Props {
-  onSave: () => void
+  onSave: (label: string, username: string, password: string) => void
 }
 
 const DashboardModal = ({ onSave }: Props) => {
+  const [label, setLabel] = useState('')
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+
+  const handleChange = (cb: React.Dispatch<React.SetStateAction<string>>) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    cb(e.target.value)
+  }
+
+  const reset = () => {
+    setLabel('')
+    setUsername('')
+    setPassword('')
+  }
+
+  const handleSave = (e: React.MouseEvent) => {
+    if (label.trim() === '' || username.trim() === '' || password.trim() === '') {
+      console.error('TODO notify inputs empty')
+      return
+    }
+
+    onSave(label, username, password)
+    reset()
+  }
+
   return (
     <div
       className="modal fade fixed top-0 left-0 hidden w-full h-full outline-none overflow-x-hidden overflow-y-auto"
@@ -47,6 +73,8 @@ const DashboardModal = ({ onSave }: Props) => {
         focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
                     id="Identifier"
                     placeholder="Identifier"
+                    value={label}
+                    onChange={handleChange(setLabel)}
                   />
                 </div>
                 <div className="form-group mb-6">
@@ -68,6 +96,8 @@ const DashboardModal = ({ onSave }: Props) => {
         focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
                     id="UserName"
                     placeholder="UserName"
+                    value={username}
+                    onChange={handleChange(setUsername)}
                   />
                 </div>
                 <div className="form-group mb-6">
@@ -89,6 +119,8 @@ const DashboardModal = ({ onSave }: Props) => {
         focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
                     id="Password"
                     placeholder="Password"
+                    value={password}
+                    onChange={handleChange(setPassword)}
                   />
                 </div>
               </form>
@@ -97,16 +129,23 @@ const DashboardModal = ({ onSave }: Props) => {
           <div className="modal-footer flex flex-shrink-0 flex-wrap items-center justify-end p-4 border-t border-gray-200 rounded-b-md">
             <button
               type="button"
-              className="inline-block px-6 py-2.5 bg-red-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-red-700 hover:shadow-lg focus:bg-red-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-red-800 active:shadow-lg transition duration-150 ease-in-out"
+              className="inline-block px-6 py-2.5 bg-slate-500 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-slate-600 hover:shadow-lg focus:bg-slate-600 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-slate-700 active:shadow-lg transition duration-150 ease-in-out"
+              onClick={reset}
+            >
+              Reset
+            </button>
+            <button
+              type="button"
+              className="inline-block px-6 py-2.5 bg-red-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-red-700 hover:shadow-lg focus:bg-red-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-red-800 active:shadow-lg transition duration-150 ease-in-out ml-1"
               data-bs-dismiss="modal"
             >
               Close
             </button>
             <button
               type="button"
-              className="inline-block px-6 py-2.5 bg-green-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-green-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-green-800 active:shadow-lg transition duration-150 ease-in-out ml-1"
+              className="inline-block px-6 py-2.5 bg-green-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-green-700 hover:shadow-lg focus:bg-green-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-green-800 active:shadow-lg transition duration-150 ease-in-out ml-1"
               data-bs-dismiss="modal"
-              onClick={onSave}
+              onClick={handleSave}
             >
               Save changes
             </button>

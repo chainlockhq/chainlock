@@ -1,5 +1,5 @@
 interface Props {
-  onReload: () => void
+  onReload?: () => void
 }
 
 const DashboardReloadButton = ({ onReload }: Props) => {

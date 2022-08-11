@@ -21,37 +21,23 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface VaultInterface extends ethers.utils.Interface {
   functions: {
-    "accounts(uint256)": FunctionFragment;
     "addPendingMember(address)": FunctionFragment;
-    "createAccount(string)": FunctionFragment;
-    "getMembersByAccountId(uint256)": FunctionFragment;
     "getOwnEncryptedPrivateKey()": FunctionFragment;
     "getOwnSecretIds()": FunctionFragment;
     "getPublicKey(address)": FunctionFragment;
+    "getSecret(uint256)": FunctionFragment;
     "isMember(address)": FunctionFragment;
     "joinVault(string,string)": FunctionFragment;
     "members(address)": FunctionFragment;
-    "membersByAccount(uint256,uint256)": FunctionFragment;
     "pendingMembers(address)": FunctionFragment;
+    "secretExists(uint256)": FunctionFragment;
     "secrets(uint256)": FunctionFragment;
-    "storeSecret(address,uint256,string,string)": FunctionFragment;
+    "storeSecret(string,string,string)": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "accounts",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "addPendingMember",
     values: [string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "createAccount",
-    values: [string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getMembersByAccountId",
-    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "getOwnEncryptedPrivateKey",
@@ -64,6 +50,10 @@ interface VaultInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "getPublicKey",
     values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getSecret",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "isMember", values: [string]): string;
   encodeFunctionData(
@@ -72,12 +62,12 @@ interface VaultInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "members", values: [string]): string;
   encodeFunctionData(
-    functionFragment: "membersByAccount",
-    values: [BigNumberish, BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "pendingMembers",
     values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "secretExists",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "secrets",
@@ -85,20 +75,11 @@ interface VaultInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "storeSecret",
-    values: [string, BigNumberish, string, string]
+    values: [string, string, string]
   ): string;
 
-  decodeFunctionResult(functionFragment: "accounts", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "addPendingMember",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "createAccount",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getMembersByAccountId",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -113,15 +94,16 @@ interface VaultInterface extends ethers.utils.Interface {
     functionFragment: "getPublicKey",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "getSecret", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "isMember", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "joinVault", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "members", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "membersByAccount",
+    functionFragment: "pendingMembers",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "pendingMembers",
+    functionFragment: "secretExists",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "secrets", data: BytesLike): Result;
@@ -131,25 +113,14 @@ interface VaultInterface extends ethers.utils.Interface {
   ): Result;
 
   events: {
-    "AccountCreated(address,uint256)": EventFragment;
-    "SecretCreated(address,address,uint256,uint256)": EventFragment;
+    "SecretCreated(address,uint256)": EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "AccountCreated"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "SecretCreated"): EventFragment;
 }
 
-export type AccountCreatedEvent = TypedEvent<
-  [string, BigNumber] & { creator: string; accountId: BigNumber }
->;
-
 export type SecretCreatedEvent = TypedEvent<
-  [string, string, BigNumber, BigNumber] & {
-    creator: string;
-    receiver: string;
-    accountId: BigNumber;
-    secretId: BigNumber;
-  }
+  [string, BigNumber] & { member: string; secretId: BigNumber }
 >;
 
 export class Vault extends BaseContract {
@@ -196,31 +167,29 @@ export class Vault extends BaseContract {
   interface: VaultInterface;
 
   functions: {
-    accounts(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[string] & { identifier: string }>;
-
     addPendingMember(
       addr: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
-
-    createAccount(
-      identifier: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    getMembersByAccountId(
-      accountId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[string[]]>;
 
     getOwnEncryptedPrivateKey(overrides?: CallOverrides): Promise<[string]>;
 
     getOwnSecretIds(overrides?: CallOverrides): Promise<[BigNumber[]]>;
 
     getPublicKey(addr: string, overrides?: CallOverrides): Promise<[string]>;
+
+    getSecret(
+      secretId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [
+        [string, string, string] & {
+          publicLabel: string;
+          encryptedUsername: string;
+          encryptedPassword: string;
+        }
+      ]
+    >;
 
     isMember(addr: string, overrides?: CallOverrides): Promise<[boolean]>;
 
@@ -237,55 +206,53 @@ export class Vault extends BaseContract {
       [string, string] & { encryptedPrivateKey: string; publicKey: string }
     >;
 
-    membersByAccount(
-      arg0: BigNumberish,
-      arg1: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
-
     pendingMembers(arg0: string, overrides?: CallOverrides): Promise<[boolean]>;
+
+    secretExists(
+      secretId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
 
     secrets(
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [string, string] & {
+      [string, string, string] & {
+        publicLabel: string;
         encryptedUsername: string;
         encryptedPassword: string;
       }
     >;
 
     storeSecret(
-      member: string,
-      accountId: BigNumberish,
+      publicLabel: string,
       encryptedUsername: string,
       encryptedPassword: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
 
-  accounts(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
-
   addPendingMember(
     addr: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
-
-  createAccount(
-    identifier: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  getMembersByAccountId(
-    accountId: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<string[]>;
 
   getOwnEncryptedPrivateKey(overrides?: CallOverrides): Promise<string>;
 
   getOwnSecretIds(overrides?: CallOverrides): Promise<BigNumber[]>;
 
   getPublicKey(addr: string, overrides?: CallOverrides): Promise<string>;
+
+  getSecret(
+    secretId: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<
+    [string, string, string] & {
+      publicLabel: string;
+      encryptedUsername: string;
+      encryptedPassword: string;
+    }
+  >;
 
   isMember(addr: string, overrides?: CallOverrides): Promise<boolean>;
 
@@ -302,49 +269,50 @@ export class Vault extends BaseContract {
     [string, string] & { encryptedPrivateKey: string; publicKey: string }
   >;
 
-  membersByAccount(
-    arg0: BigNumberish,
-    arg1: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<string>;
-
   pendingMembers(arg0: string, overrides?: CallOverrides): Promise<boolean>;
+
+  secretExists(
+    secretId: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
 
   secrets(
     arg0: BigNumberish,
     overrides?: CallOverrides
   ): Promise<
-    [string, string] & { encryptedUsername: string; encryptedPassword: string }
+    [string, string, string] & {
+      publicLabel: string;
+      encryptedUsername: string;
+      encryptedPassword: string;
+    }
   >;
 
   storeSecret(
-    member: string,
-    accountId: BigNumberish,
+    publicLabel: string,
     encryptedUsername: string,
     encryptedPassword: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    accounts(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
-
     addPendingMember(addr: string, overrides?: CallOverrides): Promise<void>;
-
-    createAccount(
-      identifier: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getMembersByAccountId(
-      accountId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<string[]>;
 
     getOwnEncryptedPrivateKey(overrides?: CallOverrides): Promise<string>;
 
     getOwnSecretIds(overrides?: CallOverrides): Promise<BigNumber[]>;
 
     getPublicKey(addr: string, overrides?: CallOverrides): Promise<string>;
+
+    getSecret(
+      secretId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [string, string, string] & {
+        publicLabel: string;
+        encryptedUsername: string;
+        encryptedPassword: string;
+      }
+    >;
 
     isMember(addr: string, overrides?: CallOverrides): Promise<boolean>;
 
@@ -361,27 +329,26 @@ export class Vault extends BaseContract {
       [string, string] & { encryptedPrivateKey: string; publicKey: string }
     >;
 
-    membersByAccount(
-      arg0: BigNumberish,
-      arg1: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
     pendingMembers(arg0: string, overrides?: CallOverrides): Promise<boolean>;
+
+    secretExists(
+      secretId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
 
     secrets(
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [string, string] & {
+      [string, string, string] & {
+        publicLabel: string;
         encryptedUsername: string;
         encryptedPassword: string;
       }
     >;
 
     storeSecret(
-      member: string,
-      accountId: BigNumberish,
+      publicLabel: string,
       encryptedUsername: string,
       encryptedPassword: string,
       overrides?: CallOverrides
@@ -389,69 +356,27 @@ export class Vault extends BaseContract {
   };
 
   filters: {
-    "AccountCreated(address,uint256)"(
-      creator?: null,
-      accountId?: null
-    ): TypedEventFilter<
-      [string, BigNumber],
-      { creator: string; accountId: BigNumber }
-    >;
-
-    AccountCreated(
-      creator?: null,
-      accountId?: null
-    ): TypedEventFilter<
-      [string, BigNumber],
-      { creator: string; accountId: BigNumber }
-    >;
-
-    "SecretCreated(address,address,uint256,uint256)"(
-      creator?: null,
-      receiver?: null,
-      accountId?: null,
+    "SecretCreated(address,uint256)"(
+      member?: null,
       secretId?: null
     ): TypedEventFilter<
-      [string, string, BigNumber, BigNumber],
-      {
-        creator: string;
-        receiver: string;
-        accountId: BigNumber;
-        secretId: BigNumber;
-      }
+      [string, BigNumber],
+      { member: string; secretId: BigNumber }
     >;
 
     SecretCreated(
-      creator?: null,
-      receiver?: null,
-      accountId?: null,
+      member?: null,
       secretId?: null
     ): TypedEventFilter<
-      [string, string, BigNumber, BigNumber],
-      {
-        creator: string;
-        receiver: string;
-        accountId: BigNumber;
-        secretId: BigNumber;
-      }
+      [string, BigNumber],
+      { member: string; secretId: BigNumber }
     >;
   };
 
   estimateGas: {
-    accounts(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
-
     addPendingMember(
       addr: string,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    createAccount(
-      identifier: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    getMembersByAccountId(
-      accountId: BigNumberish,
-      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     getOwnEncryptedPrivateKey(overrides?: CallOverrides): Promise<BigNumber>;
@@ -459,6 +384,11 @@ export class Vault extends BaseContract {
     getOwnSecretIds(overrides?: CallOverrides): Promise<BigNumber>;
 
     getPublicKey(addr: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    getSecret(
+      secretId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     isMember(addr: string, overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -470,19 +400,17 @@ export class Vault extends BaseContract {
 
     members(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    membersByAccount(
-      arg0: BigNumberish,
-      arg1: BigNumberish,
+    pendingMembers(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    secretExists(
+      secretId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
-
-    pendingMembers(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     secrets(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
 
     storeSecret(
-      member: string,
-      accountId: BigNumberish,
+      publicLabel: string,
       encryptedUsername: string,
       encryptedPassword: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -490,24 +418,9 @@ export class Vault extends BaseContract {
   };
 
   populateTransaction: {
-    accounts(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     addPendingMember(
       addr: string,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    createAccount(
-      identifier: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    getMembersByAccountId(
-      accountId: BigNumberish,
-      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     getOwnEncryptedPrivateKey(
@@ -518,6 +431,11 @@ export class Vault extends BaseContract {
 
     getPublicKey(
       addr: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getSecret(
+      secretId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -537,14 +455,13 @@ export class Vault extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    membersByAccount(
-      arg0: BigNumberish,
-      arg1: BigNumberish,
+    pendingMembers(
+      arg0: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    pendingMembers(
-      arg0: string,
+    secretExists(
+      secretId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -554,8 +471,7 @@ export class Vault extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     storeSecret(
-      member: string,
-      accountId: BigNumberish,
+      publicLabel: string,
       encryptedUsername: string,
       encryptedPassword: string,
       overrides?: Overrides & { from?: string | Promise<string> }

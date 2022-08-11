@@ -22,7 +22,10 @@ const BootingController = () => {
   const [vaultAddresses, setVaultAddresses] = useVaultAddresses(wallet, address)
   const [shouldCreateVault, setShouldCreateVault] = useState(false)
   const [currentVaultAddress, setCurrentVaultAddress] = useCurrentVaultAddress(address, vaultAddresses)
-  const goToVaultSelect = useCallback(() => setCurrentVaultAddress(undefined), [setCurrentVaultAddress])
+  const goToVaultSelect = useCallback(() => {
+    setCurrentVaultAddress(undefined)
+    setShouldCreateVault(false)
+  }, [setCurrentVaultAddress])
   const { vaultKeyPair } = useVaultKeyPair(wallet, address, currentVaultAddress, { onDialogCancel: goToVaultSelect })
 
   if (!wallet) {
@@ -58,6 +61,7 @@ const BootingController = () => {
           setVaultAddresses([...vaultAddresses, newVaultAddress])
           setShouldCreateVault(false)
         }}
+        onCancel={vaultAddresses.length <= 0 ? undefined : goToVaultSelect}
       />
     )
   }

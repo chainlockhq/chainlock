@@ -1,8 +1,8 @@
-import SecretType from "./SecretType"
+import Secret from "../../objects/Secret.interface"
 
 interface Props {
   index: number
-  secret: SecretType
+  secret: Secret
 }
 
 const DashboardSecretsRow = ({ index, secret }: Props) => {
@@ -10,9 +10,9 @@ const DashboardSecretsRow = ({ index, secret }: Props) => {
   return (
     <tr className="bg-white border-b" id={index.toString()}>
       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{index}</td>
-      <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">{secret.identifier}</td>
-      <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">{secret.username}</td>
-      <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">*********</td>
+      <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">{secret.publicLabel}</td>
+      <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">{'*'.repeat(10)}</td>
+      <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">{'*'.repeat(10)}</td>
     </tr>
   )
 }

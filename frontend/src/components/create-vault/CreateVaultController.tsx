@@ -17,9 +17,10 @@ interface Props {
   wallet: Wallet
   connectedAddress: string
   onVaultCreated?: (vaultAddress: string) => void
+  onCancel?: () => void
 }
 
-const CreateVaultController = ({ wallet, connectedAddress, onVaultCreated }: Props) => {
+const CreateVaultController = ({ wallet, connectedAddress, onVaultCreated, onCancel }: Props) => {
   const [step, setStep] = useState<Step>('landing')
   const [createdVaultAddress, setCreatedVaultAddress] = useState<string>()
 
@@ -63,7 +64,7 @@ const CreateVaultController = ({ wallet, connectedAddress, onVaultCreated }: Pro
 
   switch(step) {
     case 'landing':
-      return <CreateVaultLanding onClick={onCreateVault}/>
+      return <CreateVaultLanding onStart={onCreateVault} onBack={onCancel}/>
     case 'vault-creation-in-progress':
       return <CreateVaultInProgress/>
     case 'vault-creation-failed':

@@ -1,5 +1,5 @@
 interface Props {
-  onAddNew: () => void
+  onAddNew?: () => void
 }
 
 const DashboardAddNewButton = ({ onAddNew }: Props) => {

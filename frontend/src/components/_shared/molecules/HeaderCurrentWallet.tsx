@@ -9,7 +9,7 @@ interface Props {
 const HeaderCurrentWallet = ({walletAddress, onDisconnectWallet}: Props) => {
   return (
     <div className="flex text-[#333] text-sm p-2">
-      <div className="flex flex-col p-2 bg-[#e8cd8e] rounded-md">
+      <div className="flex flex-col p-2 bg-[#e8cd8e] rounded-l-md">
         <span className="self-end text-xs ">active wallet</span>
         <Address named>{walletAddress}</Address>
       </div>

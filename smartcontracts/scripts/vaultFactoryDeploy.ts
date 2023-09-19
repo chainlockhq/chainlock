@@ -13,7 +13,9 @@ console.log(`selected configuration: ${hre.network.name}`);
 const confs = Object.keys(hre.config.networks).join(", ");
 console.log(`\tavailable configurations: ${confs}`);
 // eslint-disable-next-line prettier/prettier
-console.log(`\texample usage: HARDHAT_NETWORK=ropsten ts-node scripts/vaultFactoryDeploy.ts`);
+console.log(
+  `\texample usage: HARDHAT_NETWORK=sepolia ts-node scripts/vaultFactoryDeploy.ts`
+);
 
 // helpful error messages
 if (!["hardhat", "localhost"].includes(hre.network.name)) {
@@ -24,8 +26,8 @@ if (!["hardhat", "localhost"].includes(hre.network.name)) {
   }
 
   // verify infura is configured
-  if (!process.env.ROPSTEN_URL?.trim()) {
-    console.error("ERROR: env var ROPSTEN_URL not provided");
+  if (!process.env.SEPOLIA_URL?.trim()) {
+    console.error("ERROR: env var SEPOLIA_URL not provided");
     process.exit(1);
   }
 }

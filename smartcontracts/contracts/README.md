@@ -25,7 +25,7 @@ Vault Factory Contract deployed at 0xb4B559447c834C991Cb26FbbDB0B7c170811831F
 #### Execution
 
 ```
-npx hardhat verify --network ropsten 0xb4B559447c834C991Cb26FbbDB0B7c170811831F
+npx hardhat verify --network sepolia 0xb4B559447c834C991Cb26FbbDB0B7c170811831F
 ```
 
 #### Console.log
@@ -38,7 +38,7 @@ contracts/VaultFactory.sol:VaultFactory at 0xb4B559447c834C991Cb26FbbDB0B7c17081
 for verification on the block explorer. Waiting for verification result...
 
 Successfully verified contract VaultFactory on Etherscan.
-https://ropsten.etherscan.io/address/0xb4B559447c834C991Cb26FbbDB0B7c170811831F#code
+https://sepolia.etherscan.io/address/0xb4B559447c834C991Cb26FbbDB0B7c170811831F#code
 ```
 
 ## Vault

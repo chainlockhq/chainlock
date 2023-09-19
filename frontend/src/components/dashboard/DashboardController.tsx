@@ -24,18 +24,20 @@ const DashboardController = ({
   goToVaultSelect,
   disconnectWallet,
 }: Props) => {
+  const [loading, setLoading] = useState<boolean>(true)
   const [secretIds, setSecretIds] = useState<BigNumber[]>([])
   const [secrets, setSecrets] = useState<Secret[]>([])
 
   // get secret ids on load
   useEffect(() => {
     (async () => {
-      if (wallet && address && vaultAddress && vaultKeyPair && secretIds.length <= 0) {
+      if (wallet && address && vaultAddress && vaultKeyPair && loading) {
         const secretIds = await getSecretIds(wallet, vaultAddress)
         setSecretIds(secretIds)
+        setLoading(false)
       }
     })()
-  }, [wallet, address, vaultAddress, vaultKeyPair, secretIds])
+  }, [wallet, address, vaultAddress, vaultKeyPair, secretIds, loading])
 
   // get secrets when secret ids change
   useEffect(() => {

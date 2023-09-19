@@ -2,7 +2,7 @@ import Wallet from "../../objects/Wallet.interface"
 import storeSecret from "../../utils/contracts/storeSecret"
 import DashboardAddNewButton from "./DashboardAddNewButton"
 import DashboardModal from "./DashboardModal"
-import DashboardReloadButton from "./DashboardReloadButton"
+// import DashboardReloadButton from "./DashboardReloadButton"
 import DashboardSecretsTable from "./DashboardSecretsTable"
 import Secret from "../../objects/Secret.interface"
 import { BigNumber } from "ethers"
@@ -26,7 +26,7 @@ const DashboardSecrets = ({ wallet, vaultAddress, vaultKeyPair, secrets, onSecre
     <div className="bg-[#2b3f4a] h-screen p-20">
       <div className="flex justify-end">
         <DashboardAddNewButton/>
-        <DashboardReloadButton/>
+        {/* <DashboardReloadButton/> */}
       </div>
       <DashboardModal
         onSave={handleSaveSecret}
